@@ -44,7 +44,7 @@
 		<section class="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3"><MetricCard label="Progress" value={`${progress}%`} detail={`${done} of ${total} done`} tone="primary" /><MetricCard label="Tasks" value={total} detail={`${done} completed`} icon={ListChecks} /><MetricCard label="Open work" value={total - done} detail="Keep momentum" tone="amber" /></section>
 
 		<div class="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
-			<Card.Root class="bg-card py-0">
+			<Card.Root class="gap-0 bg-card py-0">
 				<Card.Header class="border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between"><div><Card.Title class="text-base">Project tasks</Card.Title><Card.Description class="mt-0.5 text-xs">Everything attached to this engagement.</Card.Description></div><a href="/tasks?project={project.id}" class="text-xs font-medium text-muted-foreground hover:text-foreground">Open queue</a></Card.Header>
 				<Card.Content class="p-4">
 					{#if data.tasks.length === 0}
@@ -59,7 +59,7 @@
 				</Card.Content>
 			</Card.Root>
 
-			<Card.Root class="bg-card py-0">
+			<Card.Root class="gap-0 bg-card py-0">
 				<Card.Header class="border-b border-border px-4 py-3"><Card.Title class="text-base">Project details</Card.Title><Card.Description class="mt-0.5 text-xs">Update the context as the engagement evolves.</Card.Description></Card.Header>
 				<Card.Content class="p-4"><form method="POST" action="?/updateProject" class="space-y-4"><div class="space-y-1.5"><Label for="name">Project name</Label><Input id="name" name="name" value={project.name} required /></div><div class="space-y-1.5"><Label for="client_id">Client</Label><select id="client_id" name="client_id" class="h-9 w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm shadow-xs outline-none focus:border-ring focus:ring-3 focus:ring-ring/20"><option value="">No client attached</option>{#each data.clients as client (client.id)}<option value={client.id} selected={project.client_id === client.id}>{client.name}</option>{/each}</select></div><div class="space-y-1.5"><Label for="status">Status</Label><select id="status" name="status" class="h-9 w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm shadow-xs outline-none focus:border-ring focus:ring-3 focus:ring-ring/20"><option value="active" selected={project.status === 'active'}>Active</option><option value="on_hold" selected={project.status === 'on_hold'}>On hold</option><option value="completed" selected={project.status === 'completed'}>Completed</option><option value="archived" selected={project.status === 'archived'}>Archived</option></select></div><div class="space-y-1.5"><Label for="description">Description</Label><Textarea id="description" name="description" value={project.description ?? ''} rows={4} /></div>{#if form?.message}<p class={`text-sm ${form.success ? 'text-emerald-600' : 'text-destructive'}`}>{form.message}</p>{/if}<Button size="sm" type="submit" class="w-full">Save project</Button></form></Card.Content>
 			</Card.Root>

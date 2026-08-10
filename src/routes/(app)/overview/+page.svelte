@@ -44,6 +44,7 @@
 	function projectDoneCount(id: string) {
 		return data.tasks.filter((task) => task.project_id === id && task.status === 'done').length;
 	}
+
 </script>
 
 <svelte:head>
@@ -67,8 +68,8 @@
 	</section>
 
 	<section class="grid gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(290px,0.75fr)]">
-		<Card.Root class="bg-card">
-			<Card.Header class="border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+		<Card.Root class="gap-0 bg-card py-0">
+		<Card.Header class="border-b border-border px-4 py-3 sm:flex sm:flex-row sm:items-center sm:justify-between">
 				<div><Card.Title class="text-base">Focus list</Card.Title><Card.Description class="mt-1 text-xs">The next pieces of work worth moving forward.</Card.Description></div>
 				<a href="/tasks" class="text-xs font-medium text-muted-foreground hover:text-foreground">Open task list <ArrowUpRight class="ml-1 inline size-3.5" /></a>
 			</Card.Header>
@@ -89,8 +90,8 @@
 			</Card.Content>
 		</Card.Root>
 
-		<Card.Root class="bg-card">
-			<Card.Header class="border-b border-border px-4 py-3"><div class="flex items-center justify-between"><div><Card.Title class="text-base">Project pulse</Card.Title><Card.Description class="mt-1 text-xs">Progress across active work.</Card.Description></div><FolderKanban class="size-4 text-muted-foreground" /></div></Card.Header>
+		<Card.Root class="gap-0 bg-card py-0">
+			<Card.Header class="border-b border-border px-4 py-3 sm:flex sm:flex-row sm:items-center sm:justify-between"><div><Card.Title class="text-base">Project pulse</Card.Title><Card.Description class="mt-1 text-xs">Progress across active work.</Card.Description></div><FolderKanban class="size-4 text-muted-foreground" /></Card.Header>
 			<Card.Content class="px-4 py-4">
 				{#if data.projects.filter((project) => project.status === 'active').length === 0}
 					<div class="rounded-md border border-dashed border-border bg-muted/40 p-4"><p class="text-sm text-muted-foreground">Projects give your task list context. Start with one.</p><Button size="sm" class="mt-4" href="/projects/new"><Plus class="size-3.5" /> Add project</Button></div>
