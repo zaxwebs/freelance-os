@@ -1,13 +1,14 @@
 <script lang="ts">
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
+	import Archive from '@lucide/svelte/icons/archive';
+	import ArchiveRestore from '@lucide/svelte/icons/archive-restore';
 	import CalendarDays from '@lucide/svelte/icons/calendar-days';
 	import CheckCircle2 from '@lucide/svelte/icons/check-circle-2';
 	import Circle from '@lucide/svelte/icons/circle';
 	import FolderKanban from '@lucide/svelte/icons/folder-kanban';
 	import ListChecks from '@lucide/svelte/icons/list-checks';
 	import Plus from '@lucide/svelte/icons/plus';
-	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card';
@@ -37,7 +38,7 @@
 				<h1 class="truncate text-2xl font-semibold tracking-tight">{project.name}</h1>
 				<p class="mt-2 max-w-2xl truncate text-sm text-muted-foreground">{project.description ?? 'No project description yet.'}</p>
 			</div>
-			<div class="flex flex-wrap gap-2"><QuickCreateDialog kind="task" action="/tasks?/createTask" projects={[project]} defaultProjectId={project.id} label="Add task" variant="outline" /><form method="POST" action="?/deleteProject" onsubmit={(event) => { if (!confirm('Delete this project? Tasks will be left unassigned.')) event.preventDefault(); }}><Button variant="outline" size="sm" type="submit" class="text-destructive hover:text-destructive"><Trash2 class="size-3.5" /> Delete</Button></form></div>
+			<div class="flex flex-wrap gap-2"><QuickCreateDialog kind="task" action="/tasks?/createTask" projects={[project]} defaultProjectId={project.id} label="Add task" variant="outline" /><form method="POST" action={project.status === 'archived' ? '?/restoreProject' : '?/archiveProject'} onsubmit={(event) => { if (project.status !== 'archived' && !confirm('Archive this project? Its tasks will stay attached and the project can be restored later.')) event.preventDefault(); }}><Button variant="outline" size="sm" type="submit">{#if project.status === 'archived'}<ArchiveRestore class="size-3.5" /> Restore{:else}<Archive class="size-3.5" /> Archive{/if}</Button></form></div>
 		</header>
 
 		<section class="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3"><MetricCard label="Progress" value={`${progress}%`} detail={`${done} of ${total} done`} tone="primary" /><MetricCard label="Tasks" value={total} detail={`${done} completed`} icon={ListChecks} /><MetricCard label="Open work" value={total - done} detail="Keep momentum" tone="amber" /></section>

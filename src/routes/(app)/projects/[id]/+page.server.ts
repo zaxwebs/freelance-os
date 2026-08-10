@@ -29,11 +29,18 @@ export const actions: Actions = {
 		if (updateError) return fail(400, { message: updateError.message });
 		return { success: true, message: 'Project updated.' };
 	},
-	deleteProject: async ({ locals: { supabase }, params }) => {
+	archiveProject: async ({ locals: { supabase }, params }) => {
 		const user = await getCurrentUser(supabase);
-		if (!user) return fail(401, { message: 'Sign in to delete projects.' });
-		const { error: deleteError } = await supabase.from('projects').delete().eq('id', params.id);
-		if (deleteError) return fail(400, { message: deleteError.message });
-		redirect(303, '/projects');
+		if (!user) return fail(401, { message: 'Sign in to archive projects.' });
+		const { error: archiveError } = await supabase.from('projects').update({ status: 'archived' }).eq('id', params.id);
+		if (archiveError) return fail(400, { message: archiveError.message });
+		redirect(303, `/projects/${params.id}`);
+	},
+	restoreProject: async ({ locals: { supabase }, params }) => {
+		const user = await getCurrentUser(supabase);
+		if (!user) return fail(401, { message: 'Sign in to restore projects.' });
+		const { error: restoreError } = await supabase.from('projects').update({ status: 'active' }).eq('id', params.id);
+		if (restoreError) return fail(400, { message: restoreError.message });
+		redirect(303, `/projects/${params.id}`);
 	}
 };

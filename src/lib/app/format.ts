@@ -22,7 +22,16 @@ export function initials(value: string) {
 }
 
 export function statusLabel(status: string) {
-	return status === 'in_progress' ? 'In progress' : status === 'todo' ? 'To do' : 'Done';
+	const labels: Record<string, string> = {
+		todo: 'To do',
+		in_progress: 'In progress',
+		done: 'Done',
+		active: 'Active',
+		on_hold: 'On hold',
+		completed: 'Completed',
+		archived: 'Archived'
+	};
+	return labels[status] ?? status;
 }
 
 export function priorityLabel(priority: string) {
