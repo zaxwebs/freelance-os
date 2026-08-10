@@ -3,6 +3,6 @@
 	let { data, children } = $props();
 </script>
 
-<AppShell email={data.user.email}>{@render children()}</AppShell>
+<AppShell email={data.user.email} displayName={data.user.displayName} avatarUrl={data.user.avatarUrl}>{@render children()}</AppShell>
 
 

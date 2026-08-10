@@ -11,6 +11,22 @@ export async function getCurrentUser(supabase: WorkspaceClient): Promise<User | 
 	return user;
 }
 
+export function getDisplayName(user: User | null): string {
+	const displayName = user?.user_metadata?.display_name;
+	return typeof displayName === 'string' ? displayName.trim() : '';
+}
+
+export function getAvatarUrl(supabase: WorkspaceClient, user: User | null): string | null {
+	const avatarPath = user?.user_metadata?.avatar_path;
+	if (typeof avatarPath !== 'string' || !avatarPath) return null;
+
+	const avatarVersion = user?.user_metadata?.avatar_updated_at;
+	const publicUrl = supabase.storage.from('avatars').getPublicUrl(avatarPath).data.publicUrl;
+	return typeof avatarVersion === 'string' && avatarVersion
+		? `${publicUrl}?v=${encodeURIComponent(avatarVersion)}`
+		: publicUrl;
+}
+
 export async function getWorkspaceData(supabase: WorkspaceClient) {
 	const [clientsResult, projectsResult, tasksResult] = await Promise.all([
 		supabase.from('clients').select('*').order('name'),

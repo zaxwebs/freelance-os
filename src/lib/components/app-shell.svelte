@@ -7,23 +7,27 @@
 	import LayoutDashboard from '@lucide/svelte/icons/layout-dashboard';
 	import ListChecks from '@lucide/svelte/icons/list-checks';
 	import Plus from '@lucide/svelte/icons/plus';
-	import Search from '@lucide/svelte/icons/search';
 	import Settings from '@lucide/svelte/icons/settings';
 	import Users from '@lucide/svelte/icons/users';
 	import { page } from '$app/state';
 	import type { Snippet } from 'svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar';
-	import { Avatar, AvatarFallback } from '$lib/components/ui/avatar';
+	import { Avatar, AvatarFallback, AvatarImage } from '$lib/components/ui/avatar';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import * as Tooltip from '$lib/components/ui/tooltip';
 	import SidebarNavLink from '$lib/components/sidebar-nav-link.svelte';
+	import WorkspaceSearch from '$lib/components/workspace-search.svelte';
 
 	interface Props {
 		email: string;
+		displayName: string;
+		avatarUrl: string | null;
 		children: Snippet;
 	}
 
-	let { email, children }: Props = $props();
-	let initial = $derived(email.slice(0, 1).toUpperCase());
+	let { email, displayName, avatarUrl, children }: Props = $props();
+	let profileLabel = $derived(displayName || 'Your workspace');
+	let initial = $derived((displayName || email).slice(0, 1).toUpperCase());
 	let pageTitle = $derived(
 		page.url.pathname.startsWith('/tasks')
 			? 'Tasks'
@@ -31,9 +35,11 @@
 				? 'Projects'
 				: page.url.pathname.startsWith('/clients')
 					? 'Clients'
-					: page.url.pathname.startsWith('/settings')
-						? 'Settings'
-						: 'Overview'
+					: page.url.pathname.startsWith('/search')
+						? 'Search'
+						: page.url.pathname.startsWith('/settings')
+							? 'Settings'
+							: 'Overview'
 	);
 
 	const mainNavigation = [
@@ -89,9 +95,12 @@
 
 		<Sidebar.Footer class="p-3">
 			<a href="/settings" class="flex items-center gap-3 rounded-md border border-sidebar-border bg-sidebar-accent/40 p-2.5 transition-colors hover:bg-sidebar-accent">
-				<Avatar class="size-8 shrink-0"><AvatarFallback class="bg-sidebar-primary text-xs text-sidebar-primary-foreground">{initial}</AvatarFallback></Avatar>
+				<Avatar class="size-8 shrink-0">
+					{#if avatarUrl}<AvatarImage src={avatarUrl} alt="Profile photo" />{/if}
+					<AvatarFallback class="bg-sidebar-primary text-xs text-sidebar-primary-foreground">{initial}</AvatarFallback>
+				</Avatar>
 				<div class="min-w-0 group-data-[collapsible=icon]:hidden">
-					<p class="truncate text-xs font-medium">Your workspace</p>
+					<p class="truncate text-xs font-medium">{profileLabel}</p>
 					<p class="truncate text-[11px] text-sidebar-foreground/60">{email}</p>
 				</div>
 			</a>
@@ -109,20 +118,30 @@
 					<span class="truncate font-medium text-foreground">{pageTitle}</span>
 				</nav>
 			</div>
-			<div class="hidden min-w-0 flex-1 justify-center px-4 lg:flex">
-				<label class="relative block w-full max-w-md">
-					<span class="sr-only">Search your workspace</span>
-					<Search class="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
-					<input type="search" placeholder="Search your workspace" class="h-8 w-full rounded-md border border-input bg-muted/40 pr-16 pl-8 text-sm outline-none transition-colors placeholder:text-muted-foreground/80 focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/15" />
-					<kbd class="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 rounded border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">⌘ K</kbd>
-				</label>
-			</div>
+			<div class="flex min-w-0 flex-1 justify-center px-2 sm:px-4"><WorkspaceSearch /></div>
 			<div class="ml-auto flex items-center gap-1.5">
-				<Button variant="ghost" size="icon-sm" aria-label="Notifications"><Bell class="size-4" /></Button>
-				<Button variant="ghost" size="icon-sm" aria-label="Help and support"><CircleHelp class="size-4" /></Button>
+				<Tooltip.Root>
+					<Tooltip.Trigger>
+						{#snippet child({ props })}
+							<Button {...props} variant="ghost" size="icon-sm" aria-label="Notifications"><Bell class="size-4" /></Button>
+						{/snippet}
+					</Tooltip.Trigger>
+					<Tooltip.Content side="bottom">Coming soon</Tooltip.Content>
+				</Tooltip.Root>
+				<Tooltip.Root>
+					<Tooltip.Trigger>
+						{#snippet child({ props })}
+							<Button {...props} variant="ghost" size="icon-sm" aria-label="Help and support"><CircleHelp class="size-4" /></Button>
+						{/snippet}
+					</Tooltip.Trigger>
+					<Tooltip.Content side="bottom">Coming soon</Tooltip.Content>
+				</Tooltip.Root>
 				<Button href="/tasks/new" size="sm" class="hidden gap-1.5 sm:inline-flex"><Plus class="size-3.5" /> New task</Button>
 				<a href="/settings" class="rounded-full outline-none ring-offset-background transition-shadow focus-visible:ring-2 focus-visible:ring-ring/30">
-					<Avatar class="size-8"><AvatarFallback class="bg-primary text-xs text-primary-foreground">{initial}</AvatarFallback></Avatar>
+					<Avatar class="size-8">
+						{#if avatarUrl}<AvatarImage src={avatarUrl} alt="Profile photo" />{/if}
+						<AvatarFallback class="bg-primary text-xs text-primary-foreground">{initial}</AvatarFallback>
+					</Avatar>
 				</a>
 			</div>
 		</header>
