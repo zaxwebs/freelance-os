@@ -1,0 +1,67 @@
+<script lang="ts">
+	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
+	import ArrowRight from '@lucide/svelte/icons/arrow-right';
+	import CalendarDays from '@lucide/svelte/icons/calendar-days';
+	import CheckCircle2 from '@lucide/svelte/icons/check-circle-2';
+	import Circle from '@lucide/svelte/icons/circle';
+	import FolderKanban from '@lucide/svelte/icons/folder-kanban';
+	import ListChecks from '@lucide/svelte/icons/list-checks';
+	import Plus from '@lucide/svelte/icons/plus';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import Badge from '$lib/components/ui/badge/badge.svelte';
+	import Button from '$lib/components/ui/button/button.svelte';
+	import * as Card from '$lib/components/ui/card';
+	import Input from '$lib/components/ui/input/input.svelte';
+	import Label from '$lib/components/ui/label/label.svelte';
+	import MetricCard from '$lib/components/metric-card.svelte';
+	import QuickCreateDialog from '$lib/components/quick-create-dialog.svelte';
+	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
+	import { formatDate, isOverdue, priorityClass, priorityLabel, statusClass, statusLabel } from '$lib/app/format';
+	import type { ActionData, PageData } from './$types';
+
+	let { data, form }: { data: PageData; form?: ActionData } = $props();
+	let project = $derived(data.project);
+	let total = $derived(data.tasks.length);
+	let done = $derived(data.tasks.filter((task) => task.status === 'done').length);
+	let progress = $derived(total ? Math.round((done / total) * 100) : 0);
+</script>
+
+<svelte:head><title>{project?.name ?? 'Project'} - Freelance OS</title></svelte:head>
+
+{#if project}
+	<div class="space-y-4">
+		<div class="flex items-center gap-2 text-xs text-muted-foreground"><a href="/projects" class="inline-flex items-center gap-1.5 hover:text-foreground"><ArrowLeft class="size-3.5" /> Projects</a><span aria-hidden="true">/</span><span class="truncate font-medium text-foreground">{project.name}</span></div>
+		<header class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+			<div class="min-w-0">
+				<div class="mb-2 flex flex-wrap items-center gap-2"><span class="flex size-8 items-center justify-center rounded-md bg-muted"><FolderKanban class="size-4" /></span><Badge variant="outline">{statusLabel(project.status)}</Badge></div>
+				<h1 class="truncate text-2xl font-semibold tracking-tight">{project.name}</h1>
+				<p class="mt-2 max-w-2xl truncate text-sm text-muted-foreground">{project.description ?? 'No project description yet.'}</p>
+			</div>
+			<div class="flex flex-wrap gap-2"><QuickCreateDialog kind="task" action="/tasks?/createTask" projects={[project]} defaultProjectId={project.id} label="Add task" variant="outline" /><form method="POST" action="?/deleteProject" onsubmit={(event) => { if (!confirm('Delete this project? Tasks will be left unassigned.')) event.preventDefault(); }}><Button variant="outline" size="sm" type="submit" class="text-destructive hover:text-destructive"><Trash2 class="size-3.5" /> Delete</Button></form></div>
+		</header>
+
+		<section class="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3"><MetricCard label="Progress" value={`${progress}%`} detail={`${done} of ${total} done`} tone="primary" /><MetricCard label="Tasks" value={total} detail={`${done} completed`} icon={ListChecks} /><MetricCard label="Open work" value={total - done} detail="Keep momentum" tone="amber" /></section>
+
+		<div class="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
+			<Card.Root class="bg-card py-0">
+				<Card.Header class="border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between"><div><Card.Title class="text-base">Project tasks</Card.Title><Card.Description class="mt-0.5 text-xs">Everything attached to this engagement.</Card.Description></div><a href="/tasks?project={project.id}" class="text-xs font-medium text-muted-foreground hover:text-foreground">Open queue</a></Card.Header>
+				<Card.Content class="p-4">
+					{#if data.tasks.length === 0}
+						<div class="border border-dashed border-border px-5 py-8 text-center"><p class="text-sm text-muted-foreground">No tasks attached yet.</p><Button size="sm" class="mt-4" href="/tasks/new?project={project.id}"><Plus class="size-3.5" /> Add first task</Button></div>
+					{:else}
+						<div class="divide-y divide-border">
+							{#each data.tasks as task (task.id)}
+								<div class="flex items-center gap-3 py-3 first:pt-0 last:pb-0">{#if task.status === 'done'}<CheckCircle2 class="size-4 text-emerald-600" />{:else}<Circle class="size-4 text-muted-foreground" />{/if}<a href={`/tasks/${task.id}`} class="min-w-0 flex-1"><p class={`truncate text-sm font-medium ${task.status === 'done' ? 'text-muted-foreground line-through' : 'hover:text-primary'}`}>{task.title}</p><p class={`mt-1 flex items-center gap-2 text-xs ${isOverdue(task.due_date, task.status) ? 'text-destructive' : 'text-muted-foreground'}`}><CalendarDays class="size-3.5" /> {formatDate(task.due_date, { month: 'short', day: 'numeric' })}</p></a><span class={`hidden text-xs sm:inline ${priorityClass(task.priority)}`}>{priorityLabel(task.priority)}</span><ArrowRight class="size-3.5 text-muted-foreground" /></div>
+							{/each}
+						</div>
+					{/if}
+				</Card.Content>
+			</Card.Root>
+
+			<Card.Root class="bg-card py-0">
+				<Card.Header class="border-b border-border px-4 py-3"><Card.Title class="text-base">Project details</Card.Title><Card.Description class="mt-0.5 text-xs">Update the context as the engagement evolves.</Card.Description></Card.Header>
+				<Card.Content class="p-4"><form method="POST" action="?/updateProject" class="space-y-4"><div class="space-y-1.5"><Label for="name">Project name</Label><Input id="name" name="name" value={project.name} required /></div><div class="space-y-1.5"><Label for="client_id">Client</Label><select id="client_id" name="client_id" class="h-9 w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm shadow-xs outline-none focus:border-ring focus:ring-3 focus:ring-ring/20"><option value="">No client attached</option>{#each data.clients as client (client.id)}<option value={client.id} selected={project.client_id === client.id}>{client.name}</option>{/each}</select></div><div class="space-y-1.5"><Label for="status">Status</Label><select id="status" name="status" class="h-9 w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm shadow-xs outline-none focus:border-ring focus:ring-3 focus:ring-ring/20"><option value="active" selected={project.status === 'active'}>Active</option><option value="on_hold" selected={project.status === 'on_hold'}>On hold</option><option value="completed" selected={project.status === 'completed'}>Completed</option><option value="archived" selected={project.status === 'archived'}>Archived</option></select></div><div class="space-y-1.5"><Label for="description">Description</Label><Textarea id="description" name="description" value={project.description ?? ''} rows={4} /></div>{#if form?.message}<p class={`text-sm ${form.success ? 'text-emerald-600' : 'text-destructive'}`}>{form.message}</p>{/if}<Button size="sm" type="submit" class="w-full">Save project</Button></form></Card.Content>
+			</Card.Root>
+		</div>
+	</div>
+{:else}<p>Project not found.</p>{/if}

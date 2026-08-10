@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# SvelteKit and build output
+.svelte-kit/
+build/
+.output/
+
+# Deployment providers
+.vercel/
+.netlify/
+.wrangler/
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Local tooling and OS files
+.DS_Store
+Thumbs.db
+.idea/
+*.log
+
+# Vite generated files
+vite.config.*.timestamp-*
+
+# TypeScript build metadata
+*.tsbuildinfo
