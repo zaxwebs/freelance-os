@@ -11,6 +11,7 @@
 	import * as Card from '$lib/components/ui/card';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import PageHeader from '$lib/components/page-header.svelte';
+	import PaginationControls from '$lib/components/pagination-controls.svelte';
 	import QuickCreateDialog from '$lib/components/quick-create-dialog.svelte';
 	import { formatDate, isOverdue, priorityClass, priorityLabel, statusClass, statusLabel } from '$lib/app/format';
 	import type { PageData } from './$types';
@@ -55,10 +56,11 @@
 				<a href={`/tasks?status=${item[0]}${data.query ? `&q=${encodeURIComponent(data.query)}` : ''}${data.projectId !== 'all' ? `&project=${data.projectId}` : ''}`} class={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${data.status === item[0] ? 'bg-background text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>{item[1]}</a>
 			{/each}
 		</nav>
-		<p class="text-xs text-muted-foreground">{data.tasks.length} {data.tasks.length === 1 ? 'task' : 'tasks'}</p>
+		<p class="text-xs text-muted-foreground">{data.pagination.total} {data.pagination.total === 1 ? 'task' : 'tasks'}</p>
 	</div>
 
-	<Card.Root class="overflow-hidden bg-card py-0">
+	<div class="space-y-2">
+	<Card.Root class="overflow-hidden gap-0 bg-card py-0">
 		<Card.Header class="border-b border-border/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"><div><Card.Title class="text-base">{data.status === 'all' ? 'All tasks' : statusLabel(data.status)}</Card.Title><Card.Description class="mt-1 text-xs">Keep the next action visible and easy to finish.</Card.Description></div></Card.Header>
 		<Card.Content class="p-0">
 			{#if data.tasks.length === 0}
@@ -79,6 +81,8 @@
 			{/if}
 		</Card.Content>
 	</Card.Root>
+	<PaginationControls basePath="/tasks" page={data.pagination.page} pageSize={data.pagination.pageSize} total={data.pagination.total} query={{ q: data.query, status: data.status, project: data.projectId }} />
+	</div>
 </div>
 
 

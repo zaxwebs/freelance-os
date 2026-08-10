@@ -1,13 +1,51 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { getCurrentUser, getWorkspaceData } from '$lib/server/workspace';
+import { getPagination, PAGE_SIZE, parsePage } from '$lib/server/pagination';
+import { getCurrentUser } from '$lib/server/workspace';
 
 export const load: PageServerLoad = async ({ locals: { supabase }, url }) => {
 	const user = await getCurrentUser(supabase);
-	if (!user) return { clients: [], projects: [], tasks: [], query: '' };
-	const workspace = await getWorkspaceData(supabase);
+	if (!user) return { clients: [], projects: [], tasks: [], query: '', pagination: getPagination(1, 0), metrics: { totalProjects: 0, totalTasks: 0 } };
+
 	const query = url.searchParams.get('q')?.trim() ?? '';
-	return { ...workspace, query };
+	const requestedPage = parsePage(url.searchParams.get('page'));
+	let clientCountQuery = supabase.from('clients').select('*', { count: 'exact', head: true });
+	if (query) clientCountQuery = clientCountQuery.or(`name.ilike.%${query}%,company.ilike.%${query}%`);
+	const clientCountResult = await clientCountQuery;
+	if (clientCountResult.error) throw clientCountResult.error;
+
+	const pagination = getPagination(requestedPage, clientCountResult.count ?? 0, PAGE_SIZE);
+	let clientsQuery = supabase.from('clients').select('*').order('created_at', { ascending: false }).range((pagination.page - 1) * PAGE_SIZE, pagination.page * PAGE_SIZE - 1);
+	if (query) clientsQuery = clientsQuery.or(`name.ilike.%${query}%,company.ilike.%${query}%`);
+
+	const [clientsResult, projectCountResult, taskCountResult] = await Promise.all([
+		clientsQuery,
+		supabase.from('projects').select('*', { count: 'exact', head: true }),
+		supabase.from('tasks').select('*', { count: 'exact', head: true })
+	]);
+	if (clientsResult.error) throw clientsResult.error;
+	if (projectCountResult.error) throw projectCountResult.error;
+	if (taskCountResult.error) throw taskCountResult.error;
+
+	const clientIds = (clientsResult.data ?? []).map((client) => client.id);
+	const projectsResult = clientIds.length
+		? await supabase.from('projects').select('id,client_id').in('client_id', clientIds)
+		: { data: [], error: null };
+	if (projectsResult.error) throw projectsResult.error;
+	const projectIds = (projectsResult.data ?? []).map((project) => project.id);
+	const tasksResult = projectIds.length
+		? await supabase.from('tasks').select('project_id').in('project_id', projectIds)
+		: { data: [], error: null };
+	if (tasksResult.error) throw tasksResult.error;
+
+	return {
+		clients: clientsResult.data ?? [],
+		projects: projectsResult.data ?? [],
+		tasks: tasksResult.data ?? [],
+		query,
+		pagination,
+		metrics: { totalProjects: projectCountResult.count ?? 0, totalTasks: taskCountResult.count ?? 0 }
+	};
 };
 
 export const actions: Actions = {
