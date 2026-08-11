@@ -129,10 +129,10 @@
 				</div>
 				<div class="space-y-1.5"><Label for="business-address">Freelancer address</Label><Textarea id="business-address" name="business_address" value={data.invoiceSettings.business_address ?? ''} rows={4} /><p class="text-xs text-muted-foreground">Saved onto each new invoice so later address changes do not alter past invoices.</p></div>
 				<div class="grid gap-4 sm:grid-cols-2">
-					<div class="space-y-1.5"><Label for="business-email">Business email <span class="font-normal text-muted-foreground">optional</span></Label><Input id="business-email" name="business_email" type="email" value={data.invoiceSettings.business_email ?? ''} placeholder="hello@yourstudio.com" /></div>
-					<div class="space-y-1.5"><Label for="business-phone">Phone <span class="font-normal text-muted-foreground">optional</span></Label><Input id="business-phone" name="business_phone" value={data.invoiceSettings.business_phone ?? ''} placeholder="+1 555 0100" /></div>
+					<div class="space-y-1.5"><Label for="business-email">Business email <span class="font-normal text-muted-foreground">optional</span></Label><Input id="business-email" name="business_email" type="email" value={data.invoiceSettings.business_email ?? ''} /></div>
+					<div class="space-y-1.5"><Label for="business-phone">Phone <span class="font-normal text-muted-foreground">optional</span></Label><Input id="business-phone" name="business_phone" value={data.invoiceSettings.business_phone ?? ''} /></div>
 				</div>
-				<div class="space-y-1.5"><Label for="business-website">Website <span class="font-normal text-muted-foreground">optional</span></Label><Input id="business-website" name="business_website" type="url" value={data.invoiceSettings.business_website ?? ''} placeholder="https://yourstudio.com" /></div>
+				<div class="space-y-1.5"><Label for="business-website">Website <span class="font-normal text-muted-foreground">optional</span></Label><Input id="business-website" name="business_website" type="url" value={data.invoiceSettings.business_website ?? ''} /></div>
 				<div class="grid gap-4 sm:grid-cols-2">
 					<div class="space-y-1.5"><Label for="tax-id-label">Tax ID label <span class="font-normal text-muted-foreground">optional</span></Label><Input id="tax-id-label" name="tax_id_label" value={data.invoiceSettings.tax_id_label ?? ''} placeholder="VAT number" /></div>
 					<div class="space-y-1.5"><Label for="tax-id">Tax ID <span class="font-normal text-muted-foreground">optional</span></Label><Input id="tax-id" name="tax_id" value={data.invoiceSettings.tax_id ?? ''} placeholder="Tax number" /></div>

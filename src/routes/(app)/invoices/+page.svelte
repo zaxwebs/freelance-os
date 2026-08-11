@@ -39,7 +39,7 @@
 	<section class="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3">
 		<MetricCard label="Outstanding" value={formatMoney(data.metrics.outstanding, data.displayCurrency)} detail="Open balance" icon={Receipt} tone="primary" />
 		<MetricCard label="Overdue" value={formatMoney(data.metrics.overdue, data.displayCurrency)} detail="Needs follow-up" icon={TrendingDown} tone="amber" />
-		<MetricCard label="Paid" value={formatMoney(data.metrics.paid, data.displayCurrency)} detail="Recorded payments" icon={TrendingUp} tone="emerald" />
+		<MetricCard label="Paid" labelTooltip="Counts invoices that are fully paid. Partially paid invoices remain in Outstanding." value={formatMoney(data.metrics.paid, data.displayCurrency)} detail="Recorded payments" icon={TrendingUp} tone="emerald" />
 	</section>
 
 	<Card.Root class="gap-0 bg-card py-0">
