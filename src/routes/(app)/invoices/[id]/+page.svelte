@@ -2,7 +2,7 @@
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import CheckCircle2 from '@lucide/svelte/icons/check-circle-2';
 	import CreditCard from '@lucide/svelte/icons/credit-card';
-	import Printer from '@lucide/svelte/icons/printer';
+	import Eye from '@lucide/svelte/icons/eye';
 	import Send from '@lucide/svelte/icons/send';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
@@ -25,7 +25,7 @@
 	<header class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 		<div><div class="flex flex-wrap items-center gap-2"><h1 class="text-2xl font-semibold tracking-tight">{data.invoice.invoice_number}</h1><Badge variant="outline" class={invoiceStatusClass(data.invoice.displayStatus)}>{statusLabel(data.invoice.displayStatus)}</Badge></div><p class="mt-1 text-sm text-muted-foreground">{data.client?.name ?? 'Unknown client'}{data.project ? ` · ${data.project.name}` : ''}</p></div>
 		<div class="flex flex-wrap gap-2">
-			<Button type="button" variant="outline" size="sm" onclick={() => window.print()}><Printer class="size-3.5" /> Print</Button>
+			<Button href={`/invoices/${data.invoice.id}/preview`} variant="outline" size="sm"><Eye class="size-3.5" /> Preview invoice</Button>
 			{#if data.invoice.status === 'draft'}<form method="POST" action="?/markSent"><Button type="submit" variant="outline" size="sm"><Send class="size-3.5" /> Mark sent</Button></form>{/if}
 			{#if data.invoice.status !== 'void' && Number(data.invoice.amount_paid) === 0}<ConfirmActionDialog action="?/voidInvoice" title="Void invoice?" description="This will stop the invoice from being paid or sent." itemName={data.invoice.invoice_number} detail="The invoice will remain in your billing history as void and cannot be restored." triggerLabel="Void" confirmLabel="Void invoice" />{/if}
 		</div>
@@ -34,15 +34,6 @@
 	{#if form?.message}<p role="status" class={form.success ? 'rounded-md border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-700 dark:text-emerald-300' : 'rounded-md border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive'}>{form.message}</p>{/if}
 
 	<section class="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3"><div class="bg-card p-4"><p class="text-xs font-medium text-muted-foreground">Invoice total</p><p class="mt-2 text-2xl font-semibold">{formatMoney(data.invoice.total, data.invoice.currency_code)}</p><p class="mt-1 text-xs text-muted-foreground">Issued {formatDate(data.invoice.issue_date, { month: 'short', day: 'numeric', year: 'numeric' })}</p></div><div class="bg-card p-4"><p class="text-xs font-medium text-muted-foreground">Paid</p><p class="mt-2 text-2xl font-semibold text-emerald-600 dark:text-emerald-400">{formatMoney(data.invoice.amount_paid, data.invoice.currency_code)}</p><p class="mt-1 text-xs text-muted-foreground">{data.payments.length} payment{data.payments.length === 1 ? '' : 's'} recorded</p></div><div class="bg-card p-4"><p class="text-xs font-medium text-muted-foreground">Balance due</p><p class={`mt-2 text-2xl font-semibold ${data.invoice.displayStatus === 'overdue' ? 'text-destructive' : ''}`}>{formatMoney(outstanding, data.invoice.currency_code)}</p><p class="mt-1 text-xs text-muted-foreground">Due {formatDate(data.invoice.due_date, { month: 'short', day: 'numeric', year: 'numeric' })}</p></div></section>
-
-	<article class="rounded-md border border-border bg-card p-4 sm:p-6">
-		<div class="flex flex-col gap-5 border-b border-border pb-5 sm:flex-row sm:justify-between">
-			<div class="min-w-0"><p class="text-xs font-semibold tracking-[0.14em] text-muted-foreground uppercase">From</p><h2 class="mt-2 text-base font-semibold">{data.issuer.name ?? 'Invoice issuer'}</h2>{#if data.issuer.legalName && data.issuer.legalName !== data.issuer.name}<p class="mt-1 text-sm text-muted-foreground">{data.issuer.legalName}</p>{/if}{#if data.issuer.address}<p class="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{data.issuer.address}</p>{/if}<div class="mt-3 space-y-1 text-xs text-muted-foreground">{#if data.issuer.email}<p>{data.issuer.email}</p>{/if}{#if data.issuer.phone}<p>{data.issuer.phone}</p>{/if}{#if data.issuer.website}<p>{data.issuer.website}</p>{/if}{#if data.issuer.taxId}<p>{data.issuer.taxIdLabel ?? 'Tax ID'}: {data.issuer.taxId}</p>{/if}</div></div>
-			<div class="min-w-0 sm:max-w-xs sm:text-right"><p class="text-xs font-semibold tracking-[0.14em] text-muted-foreground uppercase">Bill to</p><h2 class="mt-2 text-base font-semibold">{data.billTo.name ?? 'Client'}</h2>{#if data.billTo.company}<p class="mt-1 text-sm text-muted-foreground">{data.billTo.company}</p>{/if}{#if data.billTo.address}<p class="mt-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">{data.billTo.address}</p>{/if}<div class="mt-3 space-y-1 text-xs text-muted-foreground">{#if data.billTo.email}<p>{data.billTo.email}</p>{/if}{#if data.billTo.taxId}<p>{data.billTo.taxIdLabel ?? 'Tax ID'}: {data.billTo.taxId}</p>{/if}</div></div>
-		</div>
-		<div class="grid gap-4 pt-5 text-sm sm:grid-cols-3"><div><p class="text-xs text-muted-foreground">Invoice number</p><p class="mt-1 font-medium">{data.invoice.invoice_number}</p></div><div><p class="text-xs text-muted-foreground">Issue date</p><p class="mt-1 font-medium">{formatDate(data.invoice.issue_date, { month: 'short', day: 'numeric', year: 'numeric' })}</p></div><div><p class="text-xs text-muted-foreground">Due date</p><p class="mt-1 font-medium">{formatDate(data.invoice.due_date, { month: 'short', day: 'numeric', year: 'numeric' })}</p></div></div>
-		{#if data.issuer.footerNote}<p class="mt-5 border-t border-border pt-4 text-center text-xs text-muted-foreground">{data.issuer.footerNote}</p>{/if}
-	</article>
 
 	<div class="grid gap-4 xl:grid-cols-[minmax(0,1fr)_330px]">
 		<div class="space-y-4">
