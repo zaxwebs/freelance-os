@@ -630,6 +630,145 @@ export type Database = {
           },
         ]
       }
+      proposal_line_items: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string
+          id: string
+          position: number
+          proposal_id: string
+          quantity: number
+          tax_rate: number
+          unit_price: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          description: string
+          id?: string
+          position?: number
+          proposal_id: string
+          quantity?: number
+          tax_rate?: number
+          unit_price?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string
+          id?: string
+          position?: number
+          proposal_id?: string
+          quantity?: number
+          tax_rate?: number
+          unit_price?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposal_line_items_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      proposals: {
+        Row: {
+          accepted_at: string | null
+          client_id: string
+          converted_at: string | null
+          created_at: string
+          currency_code: string
+          declined_at: string | null
+          id: string
+          issue_date: string
+          notes: string | null
+          overview: string | null
+          payment_terms: string | null
+          proposal_number: string
+          scope: string | null
+          sent_at: string | null
+          status: string
+          subtotal: number
+          tax_total: number
+          terms: string | null
+          timeline: string | null
+          title: string
+          total: number
+          updated_at: string
+          user_id: string
+          valid_until: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          client_id: string
+          converted_at?: string | null
+          created_at?: string
+          currency_code: string
+          declined_at?: string | null
+          id?: string
+          issue_date?: string
+          notes?: string | null
+          overview?: string | null
+          payment_terms?: string | null
+          proposal_number: string
+          scope?: string | null
+          sent_at?: string | null
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          terms?: string | null
+          timeline?: string | null
+          title: string
+          total?: number
+          updated_at?: string
+          user_id: string
+          valid_until?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          client_id?: string
+          converted_at?: string | null
+          created_at?: string
+          currency_code?: string
+          declined_at?: string | null
+          id?: string
+          issue_date?: string
+          notes?: string | null
+          overview?: string | null
+          payment_terms?: string | null
+          proposal_number?: string
+          scope?: string | null
+          sent_at?: string | null
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          terms?: string | null
+          timeline?: string | null
+          title?: string
+          total?: number
+          updated_at?: string
+          user_id?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposals_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tasks: {
         Row: {
           created_at: string

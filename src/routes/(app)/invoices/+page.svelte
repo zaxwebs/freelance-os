@@ -55,6 +55,7 @@
 			{#if data.invoices.length === 0}
 				<div class="flex flex-col items-center px-6 py-14 text-center"><div class="flex size-10 items-center justify-center rounded-md bg-muted"><FileText class="size-5 text-muted-foreground" /></div><h2 class="mt-4 text-sm font-semibold">No invoices here yet</h2><p class="mt-1 max-w-sm text-xs leading-5 text-muted-foreground">Create an invoice for a deposit, milestone, or final payment and keep the project balance visible.</p><Button href="/invoices/new" size="sm" class="mt-4"><Plus class="size-3.5" /> Create invoice</Button></div>
 			{:else}
+				<div class="hidden border-b border-border bg-muted/20 px-4 py-2.5 text-xs font-medium text-muted-foreground sm:grid sm:grid-cols-[minmax(130px,0.7fr)_minmax(180px,1fr)_minmax(140px,0.8fr)_120px_28px] sm:items-center sm:px-5"><span>Invoice</span><span>Client / project</span><span>Amount</span><span>Status</span><span aria-hidden="true"></span></div>
 				<div class="divide-y divide-border/70">
 					{#each data.invoices as invoice (invoice.id)}
 						<a href={`/invoices/${invoice.id}`} class="group grid gap-3 px-4 py-4 transition-colors hover:bg-muted/40 sm:grid-cols-[minmax(130px,0.7fr)_minmax(180px,1fr)_minmax(140px,0.8fr)_120px_28px] sm:items-center sm:px-5">
