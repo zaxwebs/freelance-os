@@ -110,7 +110,7 @@
 	</section>
 
 	<section>
-		<div class="mb-3 flex items-end justify-between"><div><p class="text-xs font-semibold tracking-[0.12em] text-muted-foreground uppercase">Recent activity</p><h2 class="mt-1 text-base font-semibold tracking-tight">Latest tasks</h2></div><a href="/tasks" class="text-xs font-medium text-muted-foreground hover:text-foreground">View all <ArrowUpRight class="ml-1 inline size-3" /></a></div>
+		<div class="mb-3 flex items-end justify-between"><h2 class="text-base font-semibold tracking-tight">Latest tasks</h2><a href="/tasks" class="text-xs font-medium text-muted-foreground hover:text-foreground">View all <ArrowUpRight class="ml-1 inline size-3" /></a></div>
 		<div class="overflow-hidden rounded-md border border-border bg-card">
 			{#each data.tasks.slice(0, 3) as task (task.id)}
 				<a href={`/tasks/${task.id}`} class="group flex items-center gap-4 border-b border-border px-4 py-3 last:border-0 transition-colors hover:bg-muted/40"><div class="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted"><CheckCircle2 class="size-4 text-muted-foreground" /></div><div class="min-w-0 flex-1"><h3 class="truncate text-sm font-medium group-hover:text-primary">{task.title}</h3><p class="mt-1 truncate text-xs text-muted-foreground">{projectName(task.project_id)} · {formatDate(task.created_at, { month: 'short', day: 'numeric' })}</p></div><div class="hidden items-center gap-3 sm:flex"><Badge variant="outline">{statusLabel(task.status)}</Badge><span class={`text-xs font-medium ${priorityClass(task.priority)}`}>{priorityLabel(task.priority)}</span></div></a>

@@ -3,12 +3,15 @@
 	import Briefcase from '@lucide/svelte/icons/briefcase';
 	import Bell from '@lucide/svelte/icons/bell';
 	import CircleHelp from '@lucide/svelte/icons/circle-help';
+	import Banknote from '@lucide/svelte/icons/banknote';
+	import FileText from '@lucide/svelte/icons/file-text';
 	import FolderKanban from '@lucide/svelte/icons/folder-kanban';
 	import LayoutDashboard from '@lucide/svelte/icons/layout-dashboard';
 	import ListChecks from '@lucide/svelte/icons/list-checks';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Settings from '@lucide/svelte/icons/settings';
 	import Users from '@lucide/svelte/icons/users';
+	import WalletCards from '@lucide/svelte/icons/wallet-cards';
 	import { page } from '$app/state';
 	import type { Snippet } from 'svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar';
@@ -33,8 +36,14 @@
 			? 'Tasks'
 			: page.url.pathname.startsWith('/projects')
 				? 'Projects'
-				: page.url.pathname.startsWith('/clients')
+			: page.url.pathname.startsWith('/clients')
 					? 'Clients'
+					: page.url.pathname.startsWith('/finance')
+						? 'Finance'
+					: page.url.pathname.startsWith('/invoices')
+						? 'Invoices'
+					: page.url.pathname.startsWith('/expenses')
+						? 'Expenses'
 					: page.url.pathname.startsWith('/search')
 						? 'Search'
 						: page.url.pathname.startsWith('/settings')
@@ -46,7 +55,10 @@
 		{ href: '/overview', label: 'Overview', icon: LayoutDashboard },
 		{ href: '/tasks', label: 'Tasks', icon: ListChecks },
 		{ href: '/projects', label: 'Projects', icon: FolderKanban },
-		{ href: '/clients', label: 'Clients', icon: Users }
+		{ href: '/clients', label: 'Clients', icon: Users },
+		{ href: '/finance', label: 'Finance', icon: Banknote },
+		{ href: '/invoices', label: 'Invoices', icon: FileText },
+		{ href: '/expenses', label: 'Expenses', icon: WalletCards }
 	];
 </script>
 

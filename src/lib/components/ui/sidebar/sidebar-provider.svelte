@@ -33,9 +33,19 @@
 			document.cookie = `${SIDEBAR_COOKIE_NAME}=${open}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
 		},
 	});
+
+	const handleInternalNavigation = (event: MouseEvent) => {
+		if (!sidebar.isMobile) return;
+		const target = event.target;
+		if (!(target instanceof Element)) return;
+		const anchor = target.closest('a[href]');
+		const href = anchor?.getAttribute('href');
+		if (!href?.startsWith('/')) return;
+		sidebar.setOpenMobile(false);
+	};
 </script>
 
-<svelte:window onkeydown={sidebar.handleShortcutKeydown} />
+<svelte:window onkeydown={sidebar.handleShortcutKeydown} onclick={handleInternalNavigation} />
 
 <Tooltip.Provider delayDuration={0}>
 	<div

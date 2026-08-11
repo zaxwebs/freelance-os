@@ -10,10 +10,11 @@
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import { taskPriorities } from '$lib/app/types';
+	import { supportedCurrencies } from '$lib/app/currency';
 
 	type QuickCreateKind = 'task' | 'project' | 'client';
 	type ProjectOption = { id: string; name: string };
-	type ClientOption = { id: string; name: string; company?: string | null };
+	type ClientOption = { id: string; name: string; company?: string | null; default_currency_code?: string | null };
 
 	interface Props {
 		kind: QuickCreateKind;
@@ -134,6 +135,14 @@
 					<Label for="quick-project-description">Description <span class="font-normal normal-case text-muted-foreground">optional</span></Label>
 					<Textarea id="quick-project-description" name="description" rows={3} placeholder="What are you helping this client move forward?" />
 				</div>
+
+				<div class="space-y-1.5">
+					<Label for="quick-project-currency">Billing currency override</Label>
+					<select id="quick-project-currency" name="billing_currency_code" class="h-9 w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm shadow-xs outline-none focus:border-ring focus:ring-3 focus:ring-ring/20">
+						<option value="">Inherit from client</option>
+						{#each supportedCurrencies as currency (currency.code)}<option value={currency.code}>{currency.code} · {currency.name}</option>{/each}
+					</select>
+				</div>
 			{:else}
 				<div class="space-y-1.5">
 					<Label for="quick-client-name">Name</Label>
@@ -149,6 +158,18 @@
 						<Label for="quick-client-email">Email <span class="font-normal normal-case text-muted-foreground">optional</span></Label>
 						<Input id="quick-client-email" name="email" type="email" placeholder="hello@acme.com" />
 					</div>
+				</div>
+
+				<div class="space-y-1.5">
+					<Label for="quick-client-address">Billing address <span class="font-normal normal-case text-muted-foreground">optional</span></Label>
+					<Textarea id="quick-client-address" name="billing_address" rows={3} />
+				</div>
+
+				<div class="space-y-1.5">
+					<Label for="quick-client-currency">Default billing currency</Label>
+					<select id="quick-client-currency" name="default_currency_code" class="h-9 w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm shadow-xs outline-none focus:border-ring focus:ring-3 focus:ring-ring/20">
+						{#each supportedCurrencies as currency (currency.code)}<option value={currency.code} selected={currency.code === 'USD'}>{currency.code} · {currency.name}</option>{/each}
+					</select>
 				</div>
 			{/if}
 

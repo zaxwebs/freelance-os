@@ -16,39 +16,576 @@ export type Database = {
     Tables: {
       clients: {
         Row: {
+          billing_address: string | null
           color: string
           company: string | null
           created_at: string
+          default_currency_code: string
           email: string | null
           id: string
           name: string
+          tax_id: string | null
+          tax_id_label: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          billing_address?: string | null
           color?: string
           company?: string | null
           created_at?: string
+          default_currency_code?: string
           email?: string | null
           id?: string
           name: string
+          tax_id?: string | null
+          tax_id_label?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          billing_address?: string | null
           color?: string
           company?: string | null
           created_at?: string
+          default_currency_code?: string
           email?: string | null
           id?: string
           name?: string
+          tax_id?: string | null
+          tax_id_label?: string | null
           updated_at?: string
           user_id?: string
         }
         Relationships: []
       }
+      finance_exchange_rates: {
+        Row: {
+          base_currency_code: string
+          created_at: string
+          id: string
+          quote_currency_code: string
+          rate: number
+          rate_date: string
+          source: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          base_currency_code?: string
+          created_at?: string
+          id?: string
+          quote_currency_code: string
+          rate: number
+          rate_date: string
+          source?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          base_currency_code?: string
+          created_at?: string
+          id?: string
+          quote_currency_code?: string
+          rate?: number
+          rate_date?: string
+          source?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      finance_expenses: {
+        Row: {
+          amount: number
+          base_amount: number
+          base_currency_code: string
+          billable: boolean
+          category: string
+          client_id: string | null
+          created_at: string
+          currency_code: string
+          description: string
+          exchange_rate: number
+          expense_date: string
+          id: string
+          invoice_id: string | null
+          notes: string | null
+          project_id: string | null
+          receipt_path: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          base_amount: number
+          base_currency_code: string
+          billable?: boolean
+          category?: string
+          client_id?: string | null
+          created_at?: string
+          currency_code: string
+          description: string
+          exchange_rate?: number
+          expense_date?: string
+          id?: string
+          invoice_id?: string | null
+          notes?: string | null
+          project_id?: string | null
+          receipt_path?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          base_amount?: number
+          base_currency_code?: string
+          billable?: boolean
+          category?: string
+          client_id?: string | null
+          created_at?: string
+          currency_code?: string
+          description?: string
+          exchange_rate?: number
+          expense_date?: string
+          id?: string
+          invoice_id?: string | null
+          notes?: string | null
+          project_id?: string | null
+          receipt_path?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "finance_expenses_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "finance_expenses_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "finance_expenses_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      finance_settings: {
+        Row: {
+          base_currency_code: string
+          created_at: string
+          display_currency_code: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          base_currency_code?: string
+          created_at?: string
+          display_currency_code?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          base_currency_code?: string
+          created_at?: string
+          display_currency_code?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      workspace_invoice_settings: {
+        Row: {
+          business_address: string | null
+          business_email: string | null
+          business_name: string | null
+          business_phone: string | null
+          business_website: string | null
+          created_at: string
+          default_payment_instructions: string | null
+          default_payment_terms_days: number
+          footer_note: string | null
+          legal_name: string | null
+          logo_path: string | null
+          tax_id: string | null
+          tax_id_label: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_address?: string | null
+          business_email?: string | null
+          business_name?: string | null
+          business_phone?: string | null
+          business_website?: string | null
+          created_at?: string
+          default_payment_instructions?: string | null
+          default_payment_terms_days?: number
+          footer_note?: string | null
+          legal_name?: string | null
+          logo_path?: string | null
+          tax_id?: string | null
+          tax_id_label?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_address?: string | null
+          business_email?: string | null
+          business_name?: string | null
+          business_phone?: string | null
+          business_website?: string | null
+          created_at?: string
+          default_payment_instructions?: string | null
+          default_payment_terms_days?: number
+          footer_note?: string | null
+          legal_name?: string | null
+          logo_path?: string | null
+          tax_id?: string | null
+          tax_id_label?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      finance_transactions: {
+        Row: {
+          amount: number
+          base_amount: number
+          base_currency_code: string
+          client_id: string | null
+          created_at: string
+          currency_code: string
+          description: string
+          exchange_rate: number
+          exchange_rate_date: string
+          exchange_rate_source: string
+          id: string
+          notes: string | null
+          project_id: string | null
+          transaction_date: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          base_amount: number
+          base_currency_code: string
+          client_id?: string | null
+          created_at?: string
+          currency_code: string
+          description: string
+          exchange_rate?: number
+          exchange_rate_date?: string
+          exchange_rate_source?: string
+          id?: string
+          notes?: string | null
+          project_id?: string | null
+          transaction_date?: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          base_amount?: number
+          base_currency_code?: string
+          client_id?: string | null
+          created_at?: string
+          currency_code?: string
+          description?: string
+          exchange_rate?: number
+          exchange_rate_date?: string
+          exchange_rate_source?: string
+          id?: string
+          notes?: string | null
+          project_id?: string | null
+          transaction_date?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "finance_transactions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "finance_transactions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoice_line_items: {
+        Row: {
+          amount: number
+          base_amount: number
+          base_currency_code: string
+          created_at: string
+          exchange_rate_date: string
+          exchange_rate_to_usd: number
+          description: string
+          id: string
+          invoice_id: string
+          position: number
+          project_id: string | null
+          quantity: number
+          source_expense_id: string | null
+          tax_rate: number
+          unit_price: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          description: string
+          id?: string
+          invoice_id: string
+          position?: number
+          project_id?: string | null
+          quantity?: number
+          source_expense_id?: string | null
+          tax_rate?: number
+          unit_price?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string
+          id?: string
+          invoice_id?: string
+          position?: number
+          project_id?: string | null
+          quantity?: number
+          source_expense_id?: string | null
+          tax_rate?: number
+          unit_price?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_line_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_line_items_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_line_items_source_expense_id_fkey"
+            columns: ["source_expense_id"]
+            isOneToOne: false
+            referencedRelation: "finance_expenses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoice_payments: {
+        Row: {
+          amount: number
+          base_amount: number
+          base_currency_code: string
+          created_at: string
+          exchange_rate_date: string
+          exchange_rate_to_usd: number
+          id: string
+          invoice_id: string
+          method: string
+          notes: string | null
+          payment_date: string
+          reference: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          base_amount?: number
+          base_currency_code?: string
+          created_at?: string
+          exchange_rate_date?: string
+          exchange_rate_to_usd?: number
+          id?: string
+          invoice_id: string
+          method?: string
+          notes?: string | null
+          payment_date?: string
+          reference?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          base_amount?: number
+          base_currency_code?: string
+          created_at?: string
+          exchange_rate_date?: string
+          exchange_rate_to_usd?: number
+          id?: string
+          invoice_id?: string
+          method?: string
+          notes?: string | null
+          payment_date?: string
+          reference?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_payments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          amount_paid: number
+          base_amount_paid: number
+          base_currency_code: string
+          base_discount_total: number
+          base_subtotal: number
+          base_tax_total: number
+          base_total: number
+          client_id: string
+          created_at: string
+          currency_code: string
+          discount_total: number
+          due_date: string
+          exchange_rate_date: string
+          exchange_rate_to_usd: number
+          id: string
+          invoice_number: string
+          issue_date: string
+          issuer_snapshot: Json
+          client_snapshot: Json
+          notes: string | null
+          paid_at: string | null
+          payment_instructions: string | null
+          project_id: string | null
+          sent_at: string | null
+          snapshot_at: string | null
+          status: string
+          subtotal: number
+          tax_total: number
+          total: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_paid?: number
+          base_amount_paid?: number
+          base_currency_code?: string
+          base_discount_total?: number
+          base_subtotal?: number
+          base_tax_total?: number
+          base_total?: number
+          client_id: string
+          created_at?: string
+          currency_code: string
+          discount_total?: number
+          due_date?: string
+          exchange_rate_date?: string
+          exchange_rate_to_usd?: number
+          id?: string
+          invoice_number: string
+          issue_date?: string
+          issuer_snapshot?: Json
+          client_snapshot?: Json
+          notes?: string | null
+          paid_at?: string | null
+          payment_instructions?: string | null
+          project_id?: string | null
+          sent_at?: string | null
+          snapshot_at?: string | null
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          total?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_paid?: number
+          base_amount_paid?: number
+          base_currency_code?: string
+          base_discount_total?: number
+          base_subtotal?: number
+          base_tax_total?: number
+          base_total?: number
+          client_id?: string
+          created_at?: string
+          currency_code?: string
+          discount_total?: number
+          due_date?: string
+          exchange_rate_date?: string
+          exchange_rate_to_usd?: number
+          id?: string
+          invoice_number?: string
+          issue_date?: string
+          issuer_snapshot?: Json
+          client_snapshot?: Json
+          notes?: string | null
+          paid_at?: string | null
+          payment_instructions?: string | null
+          project_id?: string | null
+          sent_at?: string | null
+          snapshot_at?: string | null
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          total?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
+          billing_currency_code: string | null
           client_id: string | null
           color: string
           created_at: string
@@ -60,6 +597,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          billing_currency_code?: string | null
           client_id?: string | null
           color?: string
           created_at?: string
@@ -71,6 +609,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          billing_currency_code?: string | null
           client_id?: string | null
           color?: string
           created_at?: string
@@ -276,4 +815,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-
