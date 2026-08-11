@@ -11,7 +11,7 @@
 </script>
 
 <svelte:head>
-	<title>Preview {data.proposal.proposal_number} - Freelance OS</title>
+	<title>Preview {data.proposal.title} - Freelance OS</title>
 	<meta name="description" content={`Preview proposal ${data.proposal.proposal_number}.`} />
 </svelte:head>
 

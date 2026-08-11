@@ -51,7 +51,7 @@
 
 <svelte:head><title>New invoice - Freelance OS</title></svelte:head>
 
-<div class="mx-auto max-w-5xl space-y-5">
+<div class="space-y-5">
 	<div class="flex items-center gap-2 text-xs text-muted-foreground"><a href="/invoices" class="inline-flex items-center gap-1.5 hover:text-foreground"><ArrowLeft class="size-3.5" /> Invoices</a><span aria-hidden="true">/</span><span class="font-medium text-foreground">New invoice</span></div>
 	<header><h1 class="text-2xl font-semibold tracking-tight">New invoice</h1><p class="mt-1 text-sm text-muted-foreground">Create a deposit, milestone, or final invoice for work already in motion.</p></header>
 
