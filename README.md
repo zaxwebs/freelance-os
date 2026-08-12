@@ -1,20 +1,8 @@
 # Freelance OS
 
-Freelance OS is a focused workspace for independent designers, developers, SEO specialists, and other freelancers. It brings client relationships, proposals, projects, tasks, invoices, expenses, and finance tracking into one place without the overhead of a larger project-management suite.
+Freelance OS is a flexible workspace for independent designers, developers, SEO specialists, and other freelancers. Its core is a simple way to organize clients, projects, and tasks, with optional finance and proposal tools that can be added when they fit the way you work.
 
-## Product workflow
-
-```text
-Client
-  └─ Proposal
-       └─ Accepted proposal → Project
-                              ├─ Tasks
-                              └─ Invoice → Payments
-
-Expenses and other transactions → Finance
-```
-
-Proposals belong to clients rather than projects. When a proposal is accepted, it can create a project and optionally create a deposit invoice.
+The workspace is intentionally modular: use it as a lightweight project and task manager, or extend it with client billing, expense tracking, financial records, and proposals without changing the way your core work is organized.
 
 ## Features
 
@@ -26,23 +14,14 @@ Proposals belong to clients rather than projects. When a proposal is accepted, i
 - Profile, avatar, display-currency, and invoice identity settings
 - Responsive application shell with Geist, Tailwind CSS, shadcn-svelte, Bits UI, and Lucide icons
 
-### Clients, projects, and tasks
+### Core workspace: clients, projects, and tasks
 
 - Client directory with search, pagination, contact details, billing address, tax information, and default currency
 - Project tracking with client relationships, descriptions, statuses, billing currency, and connected work
 - Task queue with status, priority, due dates, search, project filters, pagination, and quick creation
 - Detailed client and project views with connected tasks, invoices, expenses, and metrics
 
-### Proposals
-
-- Proposal creation and editing with line items and automatic totals
-- Overview, scope, timeline, payment terms, notes, and terms sections
-- Issue dates, validity dates, currencies, and proposal statuses
-- Draft, sent, viewed, accepted, declined, and expired states
-- Authenticated proposal previews
-- Accepted proposal conversion into a project, with an optional deposit invoice
-
-### Invoices and finance
+### Additional finance tools
 
 - Invoice register with pagination, status filters, line items, due dates, and previews
 - Issuer and client identity snapshots so historical invoices retain the details used when issued
@@ -52,6 +31,19 @@ Proposals belong to clients rather than projects. When a proposal is accepted, i
 - Finance dashboard for display-currency reporting and an internal USD ledger
 - Other income and cash-outflow transactions
 - Exchange-rate snapshots for supported currencies
+
+Finance is an optional extension of the core workspace for freelancers who also want to manage billing, expenses, and cash flow.
+
+### Extra proposal tools
+
+- Proposal creation and editing with line items and automatic totals
+- Overview, scope, timeline, payment terms, notes, and terms sections
+- Issue dates, validity dates, currencies, and proposal statuses
+- Draft, sent, viewed, accepted, declined, and expired states
+- Authenticated proposal previews
+- Accepted proposal conversion into a project, with an optional deposit invoice
+
+Proposals are also optional and belong to clients rather than projects. They can be used for a simple pre-work agreement or converted into a project when accepted.
 
 ## Current scope
 
