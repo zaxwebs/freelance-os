@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import ArrowUpRight from '@lucide/svelte/icons/arrow-up-right';
 	import CalendarDays from '@lucide/svelte/icons/calendar-days';
 	import CheckCircle2 from '@lucide/svelte/icons/check-circle-2';
@@ -20,6 +21,12 @@
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
+	let currentHour = $state(new Date().getHours());
+	let greeting = $derived.by(() => {
+		const salutation = currentHour < 12 ? 'Good morning' : currentHour < 18 ? 'Good afternoon' : 'Good evening';
+		const firstName = data.user.displayName.trim().split(/\s+/)[0];
+		return firstName ? `${salutation}, ${firstName}.` : `${salutation}.`;
+	});
 	let openTasks = $derived(data.tasks.filter((task) => task.status !== 'done'));
 	let dueSoon = $derived(
 		openTasks.filter((task) => {
@@ -45,6 +52,14 @@
 		return data.tasks.filter((task) => task.project_id === id && task.status === 'done').length;
 	}
 
+	onMount(() => {
+		const updateGreeting = () => {
+			currentHour = new Date().getHours();
+		};
+		const timer = setInterval(updateGreeting, 60_000);
+		return () => clearInterval(timer);
+	});
+
 </script>
 
 <svelte:head>
@@ -53,7 +68,7 @@
 </svelte:head>
 
 <div class="space-y-5">
-	<PageHeader title="Good morning." description="Here is the work that deserves your attention today.">
+	<PageHeader title={greeting} description="Here is the work that deserves your attention today.">
 		{#snippet actions()}
 			<QuickCreateDialog kind="project" action="/projects?/createProject" clients={data.clients} variant="outline" />
 			<QuickCreateDialog kind="task" action="/tasks?/createTask" projects={data.projects} />
