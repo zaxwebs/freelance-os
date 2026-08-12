@@ -75,11 +75,13 @@
 		{/snippet}
 	</PageHeader>
 
-	<section class="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 xl:grid-cols-4">
-		<MetricCard label="Open tasks" value={openTasks.length} detail="View all" href="/tasks" icon={ListChecks} tone="primary" />
-		<MetricCard label="Due this week" value={dueSoon.length} detail="Next 7 days" icon={CalendarDays} tone="amber" />
-		<MetricCard label="Active projects" value={data.projects.filter((project) => project.status === 'active').length} detail="Manage" href="/projects" icon={FolderKanban} tone="violet" />
-		<MetricCard label="Clients" value={data.clients.length} detail="View all" href="/clients" icon={Users} tone="emerald" />
+	<!-- Intentional one-off treatment: these overview stats use a dark, accent-gradient surface to create hierarchy. Do not adopt this styling for other stat areas unless explicitly instructed. -->
+	<section class="overview-stats-grid relative grid gap-0 overflow-hidden rounded-md border border-[rgba(148,163,184,0.38)] bg-[#313947] sm:grid-cols-2 xl:grid-cols-4">
+		<div aria-hidden="true" class="overview-stats-gradient pointer-events-none absolute inset-0 z-0"></div>
+		<MetricCard label="Open tasks" value={openTasks.length} detail="View all" href="/tasks" icon={ListChecks} tone="primary" featured />
+		<MetricCard label="Due this week" value={dueSoon.length} detail="Next 7 days" icon={CalendarDays} tone="amber" featured />
+		<MetricCard label="Active projects" value={data.projects.filter((project) => project.status === 'active').length} detail="Manage" href="/projects" icon={FolderKanban} tone="violet" featured />
+		<MetricCard label="Clients" value={data.clients.length} detail="View all" href="/clients" icon={Users} tone="emerald" featured />
 	</section>
 
 	<section class="grid gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(290px,0.75fr)]">
@@ -135,5 +137,40 @@
 		</div>
 	</section>
 </div>
+
+	<style>
+	.overview-stats-gradient {
+		background: radial-gradient(58% 120% at 0% 100%, rgba(12, 102, 228, 0.42) 0%, rgba(12, 102, 228, 0.2) 36%, transparent 72%), radial-gradient(58% 120% at 100% 100%, rgba(34, 197, 94, 0.26) 0%, rgba(21, 128, 61, 0.14) 42%, transparent 74%), linear-gradient(180deg, #000000 0%, #05070c 52%, #11182a 100%);
+	}
+
+	.overview-stats-grid::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 20;
+		pointer-events: none;
+		background: linear-gradient(to bottom, transparent 0 calc(25% - 0.5px), rgba(148, 163, 184, 0.38) calc(25% - 0.5px) calc(25% + 0.5px), transparent calc(25% + 0.5px) calc(50% - 0.5px), rgba(148, 163, 184, 0.38) calc(50% - 0.5px) calc(50% + 0.5px), transparent calc(50% + 0.5px) calc(75% - 0.5px), rgba(148, 163, 184, 0.38) calc(75% - 0.5px) calc(75% + 0.5px), transparent calc(75% + 0.5px) 100%);
+	}
+
+	@media (min-width: 640px) {
+		.overview-stats-gradient {
+			background: radial-gradient(48% 120% at 0% 100%, rgba(12, 102, 228, 0.42) 0%, rgba(12, 102, 228, 0.2) 36%, transparent 72%), radial-gradient(46% 105% at 50% 100%, rgba(124, 58, 237, 0.24) 0%, rgba(124, 58, 237, 0.1) 42%, transparent 74%), radial-gradient(48% 120% at 100% 100%, rgba(34, 197, 94, 0.26) 0%, rgba(21, 128, 61, 0.14) 42%, transparent 74%), linear-gradient(180deg, #000000 0%, #05070c 52%, #11182a 100%);
+		}
+
+		.overview-stats-grid::after {
+			background: linear-gradient(to right, transparent 0 calc(50% - 0.5px), rgba(148, 163, 184, 0.38) calc(50% - 0.5px) calc(50% + 0.5px), transparent calc(50% + 0.5px) 100%), linear-gradient(to bottom, transparent 0 calc(50% - 0.5px), rgba(148, 163, 184, 0.38) calc(50% - 0.5px) calc(50% + 0.5px), transparent calc(50% + 0.5px) 100%);
+		}
+	}
+
+	@media (min-width: 1280px) {
+		.overview-stats-gradient {
+			background: radial-gradient(42% 120% at 0% 100%, rgba(12, 102, 228, 0.42) 0%, rgba(12, 102, 228, 0.2) 36%, transparent 72%), radial-gradient(38% 105% at 33% 100%, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.09) 38%, transparent 72%), radial-gradient(38% 105% at 67% 100%, rgba(124, 58, 237, 0.24) 0%, rgba(124, 58, 237, 0.1) 42%, transparent 74%), radial-gradient(42% 120% at 100% 100%, rgba(34, 197, 94, 0.26) 0%, rgba(21, 128, 61, 0.14) 42%, transparent 74%), linear-gradient(180deg, #000000 0%, #05070c 52%, #11182a 100%);
+		}
+
+		.overview-stats-grid::after {
+			background: linear-gradient(to right, transparent 0 calc(25% - 0.5px), rgba(148, 163, 184, 0.38) calc(25% - 0.5px) calc(25% + 0.5px), transparent calc(25% + 0.5px) calc(50% - 0.5px), rgba(148, 163, 184, 0.38) calc(50% - 0.5px) calc(50% + 0.5px), transparent calc(50% + 0.5px) calc(75% - 0.5px), rgba(148, 163, 184, 0.38) calc(75% - 0.5px) calc(75% + 0.5px), transparent calc(75% + 0.5px) 100%);
+		}
+	}
+</style>
 
 
