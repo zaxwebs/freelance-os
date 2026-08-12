@@ -16,6 +16,17 @@ export function getDisplayName(user: User | null): string {
 	return typeof displayName === 'string' ? displayName.trim() : '';
 }
 
+export function getAccountIdentity(user: User | null) {
+	const displayName = getDisplayName(user);
+	const metadataName = user?.user_metadata?.full_name ?? user?.user_metadata?.name;
+	const accountName = displayName || (typeof metadataName === 'string' ? metadataName.trim() : '');
+	const email = user?.email?.trim() ?? '';
+	return {
+		name: accountName || email || null,
+		email: email || null
+	};
+}
+
 export function getAvatarUrl(supabase: WorkspaceClient, user: User | null): string | null {
 	const avatarPath = user?.user_metadata?.avatar_path;
 	if (typeof avatarPath !== 'string' || !avatarPath) return null;

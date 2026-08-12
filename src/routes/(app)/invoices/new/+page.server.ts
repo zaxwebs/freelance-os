@@ -1,6 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { getCurrentUser } from '$lib/server/workspace';
+import { getAccountIdentity, getCurrentUser } from '$lib/server/workspace';
 import { defaultFinanceCurrency, getEffectiveBillingCurrency, getExchangeRate, isSupportedCurrency, isValidDateRange } from '$lib/server/finance';
 import { getMinorUnits, supportedCurrencies } from '$lib/app/currency';
 
@@ -109,10 +109,11 @@ export const actions: Actions = {
 		const sentAt = sendNow ? new Date().toISOString() : null;
 		const paymentInstructions = submittedPaymentInstructions ?? invoiceSettingsResult.data?.default_payment_instructions ?? null;
 		const snapshotAt = new Date().toISOString();
+		const accountIdentity = getAccountIdentity(user);
 		const issuerSnapshot = {
-			name: invoiceSettingsResult.data?.business_name ?? invoiceSettingsResult.data?.legal_name ?? null,
+			name: invoiceSettingsResult.data?.business_name ?? invoiceSettingsResult.data?.legal_name ?? accountIdentity.name,
 			legal_name: invoiceSettingsResult.data?.legal_name ?? null,
-			email: invoiceSettingsResult.data?.business_email ?? null,
+			email: invoiceSettingsResult.data?.business_email ?? accountIdentity.email,
 			phone: invoiceSettingsResult.data?.business_phone ?? null,
 			website: invoiceSettingsResult.data?.business_website ?? null,
 			address: invoiceSettingsResult.data?.business_address ?? null,

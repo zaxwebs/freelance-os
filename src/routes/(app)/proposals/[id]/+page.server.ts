@@ -3,9 +3,9 @@ import type { Actions, PageServerLoad } from './$types';
 import { supportedCurrencies, getMinorUnits } from '$lib/app/currency';
 import { getEffectiveBillingCurrency, defaultFinanceCurrency, getExchangeRate, isSupportedCurrency, isValidDate } from '$lib/server/finance';
 import { parseProposalLineItems, proposalTotals } from '$lib/server/proposals';
-import { getCurrentUser } from '$lib/server/workspace';
+import { getAccountIdentity, getCurrentUser } from '$lib/server/workspace';
 
-async function getProposalContext(supabase: Parameters<typeof getCurrentUser>[0], proposalId: string) {
+async function getProposalContext(supabase: Parameters<typeof getCurrentUser>[0], proposalId: string, user: NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>) {
 	const proposalResult = await supabase.from('proposals').select('*').eq('id', proposalId).single();
 	if (proposalResult.error || !proposalResult.data) error(404, 'Proposal not found');
 	const proposal = proposalResult.data;
@@ -19,15 +19,16 @@ async function getProposalContext(supabase: Parameters<typeof getCurrentUser>[0]
 	if (settingsResult.error) throw settingsResult.error;
 	const clientsResult = await supabase.from('clients').select('id,name,company,default_currency_code').order('name');
 	if (clientsResult.error) throw clientsResult.error;
+	const accountIdentity = getAccountIdentity(user);
 	return {
 		proposal,
 		client: clientResult.data,
 		lineItems: lineItemsResult.data ?? [],
 		clients: clientsResult.data ?? [],
 		issuer: {
-			name: settingsResult.data?.business_name ?? settingsResult.data?.legal_name ?? null,
+			name: settingsResult.data?.business_name ?? settingsResult.data?.legal_name ?? accountIdentity.name,
 			legalName: settingsResult.data?.legal_name ?? null,
-			email: settingsResult.data?.business_email ?? null,
+			email: settingsResult.data?.business_email ?? accountIdentity.email,
 			phone: settingsResult.data?.business_phone ?? null,
 			website: settingsResult.data?.business_website ?? null,
 			address: settingsResult.data?.business_address ?? null,
@@ -70,7 +71,7 @@ function validateProposalFields(fields: ReturnType<typeof proposalFields>) {
 export const load: PageServerLoad = async ({ locals: { supabase }, params, url }) => {
 	const user = await getCurrentUser(supabase);
 	if (!user) throw redirect(303, '/');
-	const context = await getProposalContext(supabase, params.id);
+	const context = await getProposalContext(supabase, params.id, user);
 	return { ...context, currencies: supportedCurrencies, editing: url.searchParams.get('edit') === '1' };
 };
 
@@ -140,7 +141,7 @@ export const actions: Actions = {
 		const projectName = String(formData.get('project_name') ?? '').trim();
 		const createInvoice = formData.get('create_invoice') === 'on';
 		const depositAmount = Number(String(formData.get('deposit_amount') ?? '').replace(/,/g, '').trim());
-		const context = await getProposalContext(supabase, params.id);
+		const context = await getProposalContext(supabase, params.id, user);
 		if (context.proposal.status !== 'accepted') return fail(400, { message: 'Only accepted proposals can be converted.' });
 		if (context.proposal.converted_at) return fail(400, { message: 'This proposal has already been converted.' });
 		if (createInvoice && (!Number.isFinite(depositAmount) || depositAmount <= 0 || depositAmount > Number(context.proposal.total) + 0.0001)) return fail(400, { message: 'Enter a deposit amount between zero and the proposal total.' });

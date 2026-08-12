@@ -1,6 +1,6 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { getCurrentUser } from '$lib/server/workspace';
+import { getAccountIdentity, getCurrentUser } from '$lib/server/workspace';
 import { convertBaseAmount, defaultFinanceCurrency, getDisplayCurrency, getDisplayInvoiceStatus, getExchangeRate, isValidDate } from '$lib/server/finance';
 import { getMinorUnits } from '$lib/app/currency';
 
@@ -35,12 +35,13 @@ export const load: PageServerLoad = async ({ locals: { supabase }, params }) => 
 	if (lineItemsResult.error) throw lineItemsResult.error;
 	if (paymentsResult.error) throw paymentsResult.error;
 	if (invoiceSettingsResult.error) throw invoiceSettingsResult.error;
+	const accountIdentity = getAccountIdentity(user);
 	const issuerSnapshot = asSnapshotRecord(invoice.issuer_snapshot);
 	const clientSnapshot = asSnapshotRecord(invoice.client_snapshot);
 	const issuer = {
-		name: snapshotText(issuerSnapshot, 'name', invoiceSettingsResult.data?.business_name ?? invoiceSettingsResult.data?.legal_name ?? null),
+		name: snapshotText(issuerSnapshot, 'name', null) ?? invoiceSettingsResult.data?.business_name ?? invoiceSettingsResult.data?.legal_name ?? accountIdentity.name,
 		legalName: snapshotText(issuerSnapshot, 'legal_name', invoiceSettingsResult.data?.legal_name ?? null),
-		email: snapshotText(issuerSnapshot, 'email', invoiceSettingsResult.data?.business_email ?? null),
+		email: snapshotText(issuerSnapshot, 'email', null) ?? invoiceSettingsResult.data?.business_email ?? accountIdentity.email,
 		phone: snapshotText(issuerSnapshot, 'phone', invoiceSettingsResult.data?.business_phone ?? null),
 		website: snapshotText(issuerSnapshot, 'website', invoiceSettingsResult.data?.business_website ?? null),
 		address: snapshotText(issuerSnapshot, 'address', invoiceSettingsResult.data?.business_address ?? null),

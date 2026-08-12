@@ -43,8 +43,8 @@
 	</section>
 
 	<Card.Root class="gap-0 bg-card py-0">
-		<Card.Header class="border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-			<div><Card.Title class="text-base">Proposal register</Card.Title><Card.Description class="mt-0.5 text-xs">A simple record of the work you are offering.</Card.Description></div>
+		<Card.Header class="border-b border-border px-4 py-3 sm:flex sm:flex-row sm:items-center sm:justify-between">
+			<div><Card.Title class="text-base">Proposal Register</Card.Title><Card.Description class="mt-0.5 text-xs">A simple record of the work you are offering.</Card.Description></div>
 			<div class="flex flex-wrap gap-1.5">
 				{#each statusFilters as filter (filter.value)}
 					<a href={filter.value === 'all' ? '/proposals' : `/proposals?status=${filter.value}`} class={`rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${data.status === filter.value ? 'bg-foreground text-background' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}>{filter.label}</a>
@@ -55,7 +55,7 @@
 			{#if data.proposals.length === 0}
 				<div class="flex flex-col items-center px-6 py-14 text-center"><div class="flex size-10 items-center justify-center rounded-md bg-muted"><FileText class="size-5 text-muted-foreground" /></div><h2 class="mt-4 text-sm font-semibold">No proposals here yet</h2><p class="mt-1 max-w-sm text-xs leading-5 text-muted-foreground">Create a clear offer before the work moves into a project.</p><Button href="/proposals/new" size="sm" class="mt-4"><Plus class="size-3.5" /> Create proposal</Button></div>
 			{:else}
-				<div class="hidden border-b border-border bg-muted/20 px-4 py-2.5 text-xs font-medium text-muted-foreground sm:grid sm:grid-cols-[minmax(180px,1fr)_120px_140px_120px_100px_28px] sm:items-center sm:px-5"><span>Proposal</span><span>Issue date</span><span>Valid until</span><span>Amount</span><span>Status</span><span aria-hidden="true"></span></div>
+				<div class="hidden border-b border-border bg-muted/20 px-4 py-2.5 text-[10px] font-semibold tracking-[0.12em] text-muted-foreground uppercase sm:grid sm:grid-cols-[minmax(180px,1fr)_120px_140px_120px_100px_28px] sm:items-center sm:px-5"><span>Proposal</span><span>Issue Date</span><span>Valid Until</span><span>Amount</span><span>Status</span><span aria-hidden="true"></span></div>
 				<div class="divide-y divide-border/70">
 					{#each data.proposals as proposal (proposal.id)}
 						<a href={`/proposals/${proposal.id}`} class="group grid gap-3 px-4 py-4 transition-colors hover:bg-muted/40 sm:grid-cols-[minmax(180px,1fr)_120px_140px_120px_100px_28px] sm:items-center sm:px-5">

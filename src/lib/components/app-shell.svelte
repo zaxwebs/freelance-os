@@ -59,9 +59,9 @@
 		{ href: '/tasks', label: 'Tasks', icon: ListChecks },
 		{ href: '/projects', label: 'Projects', icon: FolderKanban },
 		{ href: '/clients', label: 'Clients', icon: Users },
+		{ href: '/proposals', label: 'Proposals', icon: Scroll },
 		{ href: '/finance', label: 'Finance', icon: Banknote },
 		{ href: '/invoices', label: 'Invoices', icon: ReceiptText },
-		{ href: '/proposals', label: 'Proposals', icon: Scroll },
 		{ href: '/expenses', label: 'Expenses', icon: WalletCards }
 	];
 </script>

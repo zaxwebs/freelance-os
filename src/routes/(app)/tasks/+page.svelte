@@ -50,18 +50,9 @@
 		</Card.Content>
 	</Card.Root>
 
-	<div class="flex flex-wrap items-center justify-between gap-3">
-		<nav aria-label="Task status" class="flex items-center gap-1 rounded-md bg-muted/70 p-1">
-			{#each filters as item (item[0])}
-				<a href={`/tasks?status=${item[0]}${data.query ? `&q=${encodeURIComponent(data.query)}` : ''}${data.projectId !== 'all' ? `&project=${data.projectId}` : ''}`} class={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${data.status === item[0] ? 'bg-background text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>{item[1]}</a>
-			{/each}
-		</nav>
-		<p class="text-xs text-muted-foreground">{data.pagination.total} {data.pagination.total === 1 ? 'task' : 'tasks'}</p>
-	</div>
-
 	<div class="space-y-2">
 	<Card.Root class="overflow-hidden gap-0 bg-card py-0">
-		<Card.Header class="border-b border-border/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"><div><Card.Title class="text-base">{data.status === 'all' ? 'All tasks' : statusLabel(data.status)}</Card.Title><Card.Description class="mt-1 text-xs">Keep the next action visible and easy to finish.</Card.Description></div></Card.Header>
+		<Card.Header class="border-b border-border/70 px-5 py-4 sm:flex sm:flex-row sm:items-center sm:justify-between"><div><Card.Title class="text-base">Task List</Card.Title><Card.Description class="mt-1 text-xs">Keep the next action visible and easy to finish.</Card.Description></div><nav aria-label="Task status" class="flex items-center gap-1 rounded-md bg-muted/70 p-1 sm:ml-auto">{#each filters as item (item[0])}<a href={`/tasks?status=${item[0]}${data.query ? `&q=${encodeURIComponent(data.query)}` : ''}${data.projectId !== 'all' ? `&project=${data.projectId}` : ''}`} class={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${data.status === item[0] ? 'bg-foreground text-background shadow-sm' : 'text-muted-foreground hover:bg-background/60 hover:text-foreground'}`}>{item[1]}</a>{/each}</nav></Card.Header>
 		<Card.Content class="p-0">
 			{#if data.tasks.length === 0}
 				<div class="flex flex-col items-center px-6 py-12 text-center"><div class="flex size-11 items-center justify-center rounded-full bg-muted"><ListFilter class="size-5 text-muted-foreground" /></div><h2 class="mt-4 text-sm font-semibold">No tasks match this view.</h2><p class="mt-1 text-xs text-muted-foreground">Try a different filter or add a new task.</p><Button class="mt-5" size="sm" href="/tasks/new"><Plus class="size-3.5" /> Add task</Button></div>

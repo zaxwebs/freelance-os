@@ -33,7 +33,7 @@
 		<div class="flex flex-wrap gap-2">
 			<Button href={`/proposals/${data.proposal.id}/preview`} variant="outline" size="sm"><Eye class="size-3.5" /> Preview</Button>
 			{#if data.proposal.status === 'draft'}<Button href={`/proposals/${data.proposal.id}?edit=1`} variant="outline" size="sm"><Pencil class="size-3.5" /> Edit</Button><form method="POST" action="?/markSent"><Button type="submit" size="sm"><Send class="size-3.5" /> Mark sent</Button></form>{/if}
-			{#if ['sent', 'viewed'].includes(data.proposal.status)}<form method="POST" action="?/accept"><Button type="submit" size="sm"><Check class="size-3.5" /> Accept</Button></form><form method="POST" action="?/decline"><Button type="submit" variant="outline" size="sm"><CircleX class="size-3.5" /> Decline</Button></form>{/if}
+			{#if ['sent', 'viewed'].includes(data.proposal.status)}<form method="POST" action="?/accept"><Button type="submit" size="sm"><Check class="size-3.5" /> Mark accepted</Button></form><form method="POST" action="?/decline"><Button type="submit" variant="outline" size="sm"><CircleX class="size-3.5" /> Mark declined</Button></form>{/if}
 		</div>
 	</header>
 	{#if data.proposal.overview}<section class="rounded-md border border-border bg-card px-4 py-4 sm:px-5"><p class="text-xs font-semibold tracking-[0.14em] text-muted-foreground uppercase">Overview</p><p class="mt-2 max-w-3xl whitespace-pre-line text-sm leading-6">{data.proposal.overview}</p></section>{/if}
