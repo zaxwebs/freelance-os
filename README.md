@@ -1,53 +1,71 @@
 # Freelance OS
 
-Freelance OS is a flexible workspace for independent designers, developers, SEO specialists, and other freelancers. Its core is a simple way to organize clients, projects, and tasks, with optional finance and proposal tools that can be added when they fit the way you work.
+Freelance OS is the focused workspace for people who do their best work independently.
 
-The workspace is intentionally modular: use it as a lightweight project and task manager, or extend it with client billing, expense tracking, financial records, and proposals without changing the way your core work is organized.
+It brings the work around your freelance business into one calm, connected place: keep client relationships clear, organize every project, stay on top of the next task, and carry the engagement through proposals, invoices, expenses, and financial visibility.
+
+## A better way to run freelance work
+
+Freelancers need more than a task list and less than an enterprise suite. Freelance OS is designed around that middle ground: enough structure to keep work moving, enough context to make good decisions, and none of the clutter that gets in the way.
+
+- Organize work around clients, projects, and the tasks that move it forward.
+- Keep conversations, project context, deadlines, and business details connected.
+- Move smoothly from an opportunity to active delivery and final payment.
+- See what needs attention without building a complicated system first.
+- Add the financial and client-facing tools you need as your practice grows.
 
 ## Features
 
-### Workspace
+### Clients, projects, and tasks
 
-- Magic-link authentication through Supabase Auth
-- Overview dashboard with open tasks, project activity, and finance signals
-- Workspace-wide search
-- Profile, avatar, display-currency, and invoice identity settings
-- Responsive application shell with Geist, Tailwind CSS, shadcn-svelte, Bits UI, and Lucide icons
+The core workspace keeps your engagements understandable and actionable.
 
-### Core workspace: clients, projects, and tasks
-
-- Client directory with search, pagination, contact details, billing address, tax information, and default currency
+- Client directory with search, pagination, contact details, billing addresses, tax information, and default currency
 - Project tracking with client relationships, descriptions, statuses, billing currency, and connected work
 - Task queue with status, priority, due dates, search, project filters, pagination, and quick creation
-- Detailed client and project views with connected tasks, invoices, expenses, and metrics
+- Detailed client and project views with connected tasks, invoices, expenses, and useful metrics
+- Overview dashboard with open tasks, project activity, and business signals
+- Workspace-wide search for quickly finding the work that matters
 
-### Additional finance tools
+### Proposals and client work
+
+Create polished proposals that give prospective work a clear shape and make it easy to carry an accepted engagement into delivery.
+
+- Proposal creation and editing with line items and automatic totals
+- Overview, scope, timeline, payment terms, notes, and terms sections
+- Issue dates, validity dates, currencies, and clear proposal statuses
+- Draft, sent, viewed, accepted, declined, and expired states
+- Authenticated proposal previews
+- Accepted proposals can become projects, with an optional deposit invoice
+
+### Invoices, expenses, and finance
+
+Keep the business side of freelance work close to the work itself.
 
 - Invoice register with pagination, status filters, line items, due dates, and previews
-- Issuer and client identity snapshots so historical invoices retain the details used when issued
-- Draft, sent, partially paid, paid, overdue, and void states
+- Issuer and client identity snapshots that preserve historical invoice details
+- Draft, sent, partially paid, paid, overdue, and void invoice states
 - Payment recording, including partial payments
 - Project, client, and invoice-linked expenses
 - Finance dashboard for display-currency reporting and an internal USD ledger
 - Other income and cash-outflow transactions
 - Exchange-rate snapshots for supported currencies
 
-Finance is an optional extension of the core workspace for freelancers who also want to manage billing, expenses, and cash flow.
+### Workspace settings
 
-### Extra proposal tools
+- Magic-link authentication through Supabase Auth
+- Profile and avatar settings
+- Display-currency preferences
+- Invoice identity, address, tax, payment terms, and footer settings
+- Responsive application shell built with Geist, Tailwind CSS, shadcn-svelte, Bits UI, and Lucide icons
 
-- Proposal creation and editing with line items and automatic totals
-- Overview, scope, timeline, payment terms, notes, and terms sections
-- Issue dates, validity dates, currencies, and proposal statuses
-- Draft, sent, viewed, accepted, declined, and expired states
-- Authenticated proposal previews
-- Accepted proposal conversion into a project, with an optional deposit invoice
+## Why freelancers choose Freelance OS
 
-Proposals are also optional and belong to clients rather than projects. They can be used for a simple pre-work agreement or converted into a project when accepted.
-
-## Current scope
-
-Invoice and proposal previews are currently authenticated application views. Public share links, client portals, email delivery, online payment links, reminders, and proposal acceptance from outside the app are not yet included.
+- **Focused:** built for independent work instead of adapted from a large enterprise system.
+- **Connected:** client, project, task, proposal, invoice, and expense context stays together.
+- **Flexible:** start with the organization you need and grow into deeper business management naturally.
+- **Clear:** simple statuses, useful registers, and focused views make the next action obvious.
+- **Professional:** give your work a more consistent, reliable operating rhythm from first contact to payment.
 
 ## Tech stack
 
@@ -147,7 +165,7 @@ npm run build
 
 Deploy the generated SvelteKit application using the adapter supported by your hosting platform. Configure the same `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_PUBLISHABLE_KEY` environment variables in production, and add the deployed authentication callback URL to the Supabase Auth redirect URL allowlist.
 
-## Planned improvements
+## Roadmap
 
 - Public, expiring proposal and invoice links
 - Client-facing portal and email delivery
