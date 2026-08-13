@@ -1,10 +1,10 @@
 <script lang="ts">
-	import CalendarDays from '@lucide/svelte/icons/calendar-days';
 	import FolderKanban from '@lucide/svelte/icons/folder-kanban';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Users from '@lucide/svelte/icons/users';
 	import { enhance } from '$app/forms';
 	import Button, { type ButtonVariant } from '$lib/components/ui/button/button.svelte';
+	import DatePicker from '$lib/components/date-picker.svelte';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
@@ -113,7 +113,7 @@
 
 				<div class="space-y-1.5">
 					<Label for="quick-task-due-date">Due date <span class="font-normal normal-case text-muted-foreground">optional</span></Label>
-					<div class="relative"><CalendarDays class="pointer-events-none absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-muted-foreground" /><Input id="quick-task-due-date" name="due_date" type="date" class="pl-9" /></div>
+					<DatePicker id="quick-task-due-date" name="due_date" />
 				</div>
 			{:else if kind === 'project'}
 				<div class="space-y-1.5">
