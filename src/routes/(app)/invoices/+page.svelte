@@ -11,7 +11,7 @@
 	import MetricCard from '$lib/components/metric-card.svelte';
 	import PageHeader from '$lib/components/page-header.svelte';
 	import PaginationControls from '$lib/components/pagination-controls.svelte';
-	import { formatDate, invoiceStatusClass, statusLabel } from '$lib/app/format';
+	import { formatDate, invoiceStatusClass, overdueDateClass, statusLabel } from '$lib/app/format';
 	import { formatMoney } from '$lib/app/currency';
 	import type { PageData } from './$types';
 
@@ -61,8 +61,8 @@
 						<a href={`/invoices/${invoice.id}`} class="group grid gap-3 px-4 py-4 transition-colors hover:bg-muted/40 sm:grid-cols-[minmax(130px,0.7fr)_minmax(180px,1fr)_minmax(140px,0.8fr)_120px_28px] sm:items-center sm:px-5">
 							<div><p class="text-sm font-semibold group-hover:text-primary">{invoice.invoice_number}</p><p class="mt-1 text-xs text-muted-foreground">Issued {formatDate(invoice.issue_date, { month: 'short', day: 'numeric', year: 'numeric' })}</p></div>
 							<div class="min-w-0"><p class="truncate text-sm font-medium">{invoice.clientName}</p><p class="mt-1 truncate text-xs text-muted-foreground">{invoice.projectName ?? 'No project attached'}</p></div>
-							<div><p class="text-sm font-medium">{formatMoney(invoice.displayTotal, data.displayCurrency)}</p><p class="mt-1 text-xs text-muted-foreground">{formatMoney(invoice.displayTotal - invoice.displayAmountPaid, data.displayCurrency)} due · {invoice.currency_code} invoice</p></div>
-							<div><Badge variant="outline" class={invoiceStatusClass(invoice.displayStatus)}>{statusLabel(invoice.displayStatus)}</Badge><p class={`mt-1 text-xs ${invoice.displayStatus === 'overdue' ? 'text-destructive' : 'text-muted-foreground'}`}>Due {formatDate(invoice.due_date, { month: 'short', day: 'numeric' })}</p></div>
+							<div><p class="text-sm font-medium">{formatMoney(invoice.displayTotal, data.displayCurrency)}</p><p class="mt-1 text-xs text-muted-foreground">{formatMoney(invoice.displayTotal - invoice.displayAmountPaid, data.displayCurrency)} due{invoice.currency_code !== data.displayCurrency ? ` · ${invoice.currency_code} invoice` : ''}</p></div>
+							<div><Badge class={invoiceStatusClass(invoice.displayStatus)}>{statusLabel(invoice.displayStatus)}</Badge><p class={`mt-1 text-xs ${overdueDateClass(invoice.displayStatus === 'overdue')}`}>Due {formatDate(invoice.due_date, { month: 'short', day: 'numeric' })}</p></div>
 							<ArrowRight class="size-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
 						</a>
 					{/each}

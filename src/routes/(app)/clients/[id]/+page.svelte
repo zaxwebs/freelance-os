@@ -7,6 +7,7 @@
 	import Mail from '@lucide/svelte/icons/mail';
 	import ReceiptText from '@lucide/svelte/icons/receipt-text';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import DeleteConfirmDialog from '$lib/components/delete-confirm-dialog.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
@@ -56,7 +57,7 @@
 						<a href={`/invoices/${invoice.id}`} class="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/40">
 							<span class="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted"><ReceiptText class="size-3.5" /></span>
 							<span class="min-w-0 flex-1"><span class="block truncate text-sm font-medium group-hover:text-primary">{invoice.invoice_number}</span><span class="mt-1 block truncate text-xs text-muted-foreground">{invoice.project_id ? data.projects.find((project) => project.id === invoice.project_id)?.name ?? 'Project' : 'No project attached'} · Due {formatDate(invoice.due_date, { month: 'short', day: 'numeric' })}</span></span>
-							<span class="text-right"><span class="block text-sm font-medium">{formatMoney(invoice.displayTotal, data.displayCurrency)}</span><span class={`mt-1 block text-xs ${invoiceStatusClass(invoice.displayStatus)} rounded-full px-2 py-0.5`}>{statusLabel(invoice.displayStatus)}</span></span>
+							<span class="text-right"><span class="block text-sm font-medium">{formatMoney(invoice.displayTotal, data.displayCurrency)}</span><Badge class={`mt-1 ${invoiceStatusClass(invoice.displayStatus)}`}>{statusLabel(invoice.displayStatus)}</Badge></span>
 							<ArrowRight class="size-3.5 text-muted-foreground transition-transform group-hover:translate-x-1" />
 						</a>
 					{/each}

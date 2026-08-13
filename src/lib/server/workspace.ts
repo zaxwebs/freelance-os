@@ -39,19 +39,21 @@ export function getAvatarUrl(supabase: WorkspaceClient, user: User | null): stri
 }
 
 export async function getWorkspaceData(supabase: WorkspaceClient) {
-	const [clientsResult, projectsResult, tasksResult] = await Promise.all([
+	const [clientsResult, projectsResult, tasksResult, latestTasksResult] = await Promise.all([
 		supabase.from('clients').select('*').order('name'),
 		supabase.from('projects').select('*').order('created_at', { ascending: false }),
-		supabase.from('tasks').select('*').order('due_date', { ascending: true, nullsFirst: false })
+		supabase.from('tasks').select('*').order('due_date', { ascending: true, nullsFirst: false }),
+		supabase.from('tasks').select('*').order('created_at', { ascending: false }).limit(3)
 	]);
 
-	const error = clientsResult.error ?? projectsResult.error ?? tasksResult.error;
+	const error = clientsResult.error ?? projectsResult.error ?? tasksResult.error ?? latestTasksResult.error;
 	if (error) throw error;
 
 	return {
 		clients: (clientsResult.data ?? []) as Client[],
 		projects: (projectsResult.data ?? []) as Project[],
-		tasks: (tasksResult.data ?? []) as Task[]
+		tasks: (tasksResult.data ?? []) as Task[],
+		latestTasks: (latestTasksResult.data ?? []) as Task[]
 	};
 }
 

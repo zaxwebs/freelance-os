@@ -23,7 +23,7 @@
 <div class="space-y-5">
 	<div class="flex items-center gap-2 text-xs text-muted-foreground"><a href="/invoices" class="inline-flex items-center gap-1.5 hover:text-foreground"><ArrowLeft class="size-3.5" /> Invoices</a><span aria-hidden="true">/</span><span class="font-medium text-foreground">{data.invoice.invoice_number}</span></div>
 	<header class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-		<div><div class="flex flex-wrap items-center gap-2"><h1 class="text-2xl font-semibold tracking-tight">{data.invoice.invoice_number}</h1><Badge variant="outline" class={invoiceStatusClass(data.invoice.displayStatus)}>{statusLabel(data.invoice.displayStatus)}</Badge></div><p class="mt-1 text-sm text-muted-foreground">{data.client?.name ?? 'Unknown client'}{data.project ? ` · ${data.project.name}` : ''}</p></div>
+		<div><div class="flex flex-wrap items-center gap-2"><h1 class="text-2xl font-semibold tracking-tight">{data.invoice.invoice_number}</h1><Badge class={invoiceStatusClass(data.invoice.displayStatus)}>{statusLabel(data.invoice.displayStatus)}</Badge></div><p class="mt-1 text-sm text-muted-foreground">{data.client?.name ?? 'Unknown client'}{data.project ? ` · ${data.project.name}` : ''}</p></div>
 		<div class="flex flex-wrap gap-2">
 			<Button href={`/invoices/${data.invoice.id}/preview`} variant="outline" size="sm"><Eye class="size-3.5" /> Preview invoice</Button>
 			{#if data.invoice.status === 'draft'}<form method="POST" action="?/markSent"><Button type="submit" variant="outline" size="sm"><Send class="size-3.5" /> Mark sent</Button></form>{/if}

@@ -34,7 +34,7 @@
 				<div class="min-w-0 sm:text-right">
 					<p class="text-xs font-medium text-muted-foreground">Invoice number</p>
 					<p class="mt-1 text-lg font-semibold">{data.invoice.invoice_number}</p>
-					<Badge variant="outline" class={`mt-3 ${invoiceStatusClass(data.invoice.displayStatus)}`}>{statusLabel(data.invoice.displayStatus)}</Badge>
+					<Badge class={`mt-3 ${invoiceStatusClass(data.invoice.displayStatus)}`}>{statusLabel(data.invoice.displayStatus)}</Badge>
 					<div class="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 text-left text-sm sm:text-right">
 						<div><p class="text-xs text-muted-foreground">Issue date</p><p class="mt-1 font-medium">{formatDate(data.invoice.issue_date, { month: 'short', day: 'numeric', year: 'numeric' })}</p></div>
 						<div><p class="text-xs text-muted-foreground">Due date</p><p class="mt-1 font-medium">{formatDate(data.invoice.due_date, { month: 'short', day: 'numeric', year: 'numeric' })}</p></div>

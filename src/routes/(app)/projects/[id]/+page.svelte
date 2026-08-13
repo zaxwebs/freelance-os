@@ -18,7 +18,7 @@
 	import MetricCard from '$lib/components/metric-card.svelte';
 	import QuickCreateDialog from '$lib/components/quick-create-dialog.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
-	import { formatDate, invoiceStatusClass, isOverdue, priorityClass, priorityLabel, statusLabel } from '$lib/app/format';
+	import { formatDate, invoiceStatusClass, isOverdue, overdueDateClass, priorityClass, priorityLabel, statusClass, statusLabel } from '$lib/app/format';
 	import { formatMoney } from '$lib/app/currency';
 	import { supportedCurrencies } from '$lib/app/currency';
 	import type { ActionData, PageData } from './$types';
@@ -37,7 +37,7 @@
 		<div class="flex items-center gap-2 text-xs text-muted-foreground"><a href="/projects" class="inline-flex items-center gap-1.5 hover:text-foreground"><ArrowLeft class="size-3.5" /> Projects</a><span aria-hidden="true">/</span><span class="truncate font-medium text-foreground">{project.name}</span></div>
 		<header class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 			<div class="min-w-0">
-				<div class="mb-2 flex flex-wrap items-center gap-2"><span class="flex size-8 items-center justify-center rounded-md bg-muted"><FolderKanban class="size-4" /></span><Badge variant="outline">{statusLabel(project.status)}</Badge></div>
+				<div class="mb-2 flex flex-wrap items-center gap-2"><span class="flex size-8 items-center justify-center rounded-md bg-muted"><FolderKanban class="size-4" /></span><Badge class={statusClass(project.status)}>{statusLabel(project.status)}</Badge></div>
 				<h1 class="truncate text-2xl font-semibold tracking-tight">{project.name}</h1>
 				<p class="mt-2 max-w-2xl truncate text-sm text-muted-foreground">{project.description ?? 'No project description yet.'}</p>
 			</div>
@@ -55,7 +55,7 @@
 					{:else}
 						<div class="divide-y divide-border">
 							{#each data.tasks as task (task.id)}
-								<div class="flex items-center gap-3 py-3 first:pt-0 last:pb-0">{#if task.status === 'done'}<CheckCircle2 class="size-4 text-emerald-600" />{:else}<Circle class="size-4 text-muted-foreground" />{/if}<a href={`/tasks/${task.id}`} class="min-w-0 flex-1"><p class={`truncate text-sm font-medium ${task.status === 'done' ? 'text-muted-foreground line-through' : 'hover:text-primary'}`}>{task.title}</p><p class={`mt-1 flex items-center gap-2 text-xs ${isOverdue(task.due_date, task.status) ? 'text-destructive' : 'text-muted-foreground'}`}><CalendarDays class="size-3.5" /> {formatDate(task.due_date, { month: 'short', day: 'numeric' })}</p></a><span class={`hidden text-xs sm:inline ${priorityClass(task.priority)}`}>{priorityLabel(task.priority)}</span><ArrowRight class="size-3.5 text-muted-foreground" /></div>
+							<div class="flex items-center gap-3 py-3 first:pt-0 last:pb-0">{#if task.status === 'done'}<CheckCircle2 class="size-4 text-emerald-600" />{:else}<Circle class="size-4 text-muted-foreground" />{/if}<a href={`/tasks/${task.id}`} class="min-w-0 flex-1"><p class={`truncate text-sm font-medium ${task.status === 'done' ? 'text-muted-foreground line-through' : 'hover:text-primary'}`}>{task.title}</p><p class={`mt-1 flex items-center gap-2 text-xs ${overdueDateClass(isOverdue(task.due_date, task.status))}`}><CalendarDays class="size-3.5" /> {formatDate(task.due_date, { month: 'short', day: 'numeric' })}</p></a><Badge class={`hidden sm:inline-flex ${statusClass(task.status)}`}>{statusLabel(task.status)}</Badge><Badge variant="outline" class={`hidden sm:inline-flex ${priorityClass(task.priority)}`}>{priorityLabel(task.priority)}</Badge><ArrowRight class="size-3.5 text-muted-foreground" /></div>
 							{/each}
 						</div>
 					{/if}
@@ -86,7 +86,7 @@
 						<a href={`/invoices/${invoice.id}`} class="group flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/40">
 							<span class="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted"><ReceiptText class="size-3.5" /></span>
 							<span class="min-w-0 flex-1"><span class="block truncate text-sm font-medium group-hover:text-primary">{invoice.invoice_number}</span><span class="mt-1 block truncate text-xs text-muted-foreground">Due {formatDate(invoice.due_date, { month: 'short', day: 'numeric', year: 'numeric' })}</span></span>
-							<span class="text-right"><span class="block text-sm font-medium">{formatMoney(invoice.displayTotal, data.displayCurrency)}</span><span class={`mt-1 block text-xs ${invoiceStatusClass(invoice.displayStatus)} rounded-full px-2 py-0.5`}>{statusLabel(invoice.displayStatus)}</span></span>
+							<span class="text-right"><span class="block text-sm font-medium">{formatMoney(invoice.displayTotal, data.displayCurrency)}</span><Badge class={`mt-1 ${invoiceStatusClass(invoice.displayStatus)}`}>{statusLabel(invoice.displayStatus)}</Badge></span>
 							<ArrowRight class="size-3.5 text-muted-foreground transition-transform group-hover:translate-x-1" />
 						</a>
 					{/each}

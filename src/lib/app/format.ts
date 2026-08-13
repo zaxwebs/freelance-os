@@ -49,33 +49,35 @@ export function priorityLabel(priority: string) {
 }
 
 export function statusClass(status: TaskStatus | string) {
-	return status === 'done'
+	return status === 'done' || status === 'completed'
 		? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
-		: status === 'in_progress'
+		: status === 'in_progress' || status === 'active'
 			? 'bg-blue-500/10 text-blue-700 dark:text-blue-300'
-			: 'bg-muted text-muted-foreground';
+			: status === 'on_hold'
+				? 'bg-amber-500/10 text-amber-700 dark:text-amber-300'
+				: 'bg-muted text-muted-foreground';
 }
 
 export function priorityClass(priority: TaskPriority | string) {
 	return priority === 'urgent'
-		? 'text-destructive'
+		? 'border-transparent bg-destructive text-white'
 		: priority === 'high'
-			? 'text-amber-600 dark:text-amber-400'
+			? 'border-transparent bg-violet-600 text-white'
 			: priority === 'medium'
-				? 'text-foreground'
-				: 'text-muted-foreground';
+				? 'border-transparent bg-blue-600 text-white'
+				: 'border-transparent bg-emerald-600 text-white';
 }
 
 export function invoiceStatusClass(status: string) {
 	return status === 'paid'
-		? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
+		? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:border-emerald-400/25 dark:text-emerald-300'
 		: status === 'overdue'
-			? 'bg-destructive/10 text-destructive'
+			? 'border-destructive/20 bg-destructive/10 text-destructive dark:border-destructive/30'
 			: status === 'partially_paid'
-				? 'bg-amber-500/10 text-amber-700 dark:text-amber-300'
+				? 'border-amber-500/20 bg-amber-500/10 text-amber-700 dark:border-amber-400/25 dark:text-amber-300'
 				: status === 'void'
-					? 'bg-muted text-muted-foreground'
-					: 'bg-blue-500/10 text-blue-700 dark:text-blue-300';
+					? 'border-border bg-muted text-muted-foreground'
+					: 'border-blue-500/20 bg-blue-500/10 text-blue-700 dark:border-blue-400/25 dark:text-blue-300';
 }
 
 export function proposalStatusClass(status: string) {
@@ -95,4 +97,8 @@ export function isOverdue(value: string | null | undefined, status: string) {
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
 	return new Date(`${value.slice(0, 10)}T00:00:00`) < today;
+}
+
+export function overdueDateClass(overdue: boolean) {
+	return overdue ? 'font-medium text-pink-700 dark:text-pink-300' : 'text-muted-foreground';
 }

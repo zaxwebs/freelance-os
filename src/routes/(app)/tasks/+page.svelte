@@ -13,7 +13,7 @@
 	import PageHeader from '$lib/components/page-header.svelte';
 	import PaginationControls from '$lib/components/pagination-controls.svelte';
 	import QuickCreateDialog from '$lib/components/quick-create-dialog.svelte';
-	import { formatDate, isOverdue, priorityClass, priorityLabel, statusClass, statusLabel } from '$lib/app/format';
+	import { formatDate, isOverdue, overdueDateClass, priorityClass, priorityLabel, statusClass, statusLabel } from '$lib/app/format';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -64,8 +64,8 @@
 							<form method="POST" action="?/updateTaskStatus"><input type="hidden" name="task_id" value={task.id} /><input type="hidden" name="status" value={task.status === 'done' ? 'todo' : 'done'} /><Button variant="ghost" size="icon-sm" type="submit" aria-label={task.status === 'done' ? 'Reopen task' : 'Mark task done'} class="rounded-full">{#if task.status === 'done'}<CheckCircle2 class="size-4 text-emerald-600" />{:else}<Circle class="size-4 text-muted-foreground" />{/if}</Button></form>
 							<a href={`/tasks/${task.id}`} class="min-w-0 sm:col-auto"><p class={`truncate text-sm font-medium ${task.status === 'done' ? 'text-muted-foreground line-through' : 'hover:text-primary'}`}>{task.title}</p><p class="mt-1 truncate text-xs text-muted-foreground">{projectName(task.project_id)}</p></a>
 							<div class="flex items-center gap-2 sm:block"><span class="text-[10px] font-semibold tracking-[0.1em] text-muted-foreground uppercase sm:hidden">Status</span><Badge class={statusClass(task.status)}>{statusLabel(task.status)}</Badge></div>
-							<div class="flex items-center gap-2 sm:block"><span class="text-[10px] font-semibold tracking-[0.1em] text-muted-foreground uppercase sm:hidden">Priority</span><span class={`text-xs font-medium ${priorityClass(task.priority)}`}>{priorityLabel(task.priority)}</span></div>
-							<span class={`flex items-center gap-2 text-xs ${isOverdue(task.due_date, task.status) ? 'font-medium text-destructive' : 'text-muted-foreground'}`}><CalendarDays class="size-3.5" /> {formatDate(task.due_date, { month: 'short', day: 'numeric' })}<ArrowUpRight class="ml-auto size-3.5 sm:hidden" /></span>
+							<div class="flex items-center gap-2 sm:block"><span class="text-[10px] font-semibold tracking-[0.1em] text-muted-foreground uppercase sm:hidden">Priority</span><Badge variant="outline" class={priorityClass(task.priority)}>{priorityLabel(task.priority)}</Badge></div>
+							<span class={`flex items-center gap-2 text-xs ${overdueDateClass(isOverdue(task.due_date, task.status))}`}><CalendarDays class="size-3.5" /> {formatDate(task.due_date, { month: 'short', day: 'numeric' })}<ArrowUpRight class="ml-auto size-3.5 sm:hidden" /></span>
 						</div>
 					{/each}
 				</div>

@@ -4,7 +4,6 @@
 	import CalendarDays from '@lucide/svelte/icons/calendar-days';
 	import CheckCircle2 from '@lucide/svelte/icons/check-circle-2';
 	import Circle from '@lucide/svelte/icons/circle';
-	import Clock3 from '@lucide/svelte/icons/clock-3';
 	import FolderKanban from '@lucide/svelte/icons/folder-kanban';
 	import Inbox from '@lucide/svelte/icons/inbox';
 	import ListChecks from '@lucide/svelte/icons/list-checks';
@@ -16,7 +15,7 @@
 	import MetricCard from '$lib/components/metric-card.svelte';
 	import PageHeader from '$lib/components/page-header.svelte';
 	import QuickCreateDialog from '$lib/components/quick-create-dialog.svelte';
-	import { formatDate, isOverdue, priorityClass, priorityLabel, statusLabel } from '$lib/app/format';
+	import { formatDate, isOverdue, overdueDateClass, priorityClass, priorityLabel, statusClass, statusLabel } from '$lib/app/format';
 	import { SvelteDate } from 'svelte/reactivity';
 	import type { PageData } from './$types';
 
@@ -99,7 +98,7 @@
 							<div class="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/40">
 								<form method="POST" action="?/updateTaskStatus"><input type="hidden" name="task_id" value={task.id} /><input type="hidden" name="status" value="done" /><Button variant="ghost" size="icon-sm" type="submit" aria-label="Mark task done" class="rounded-full"><Circle class="size-4 text-muted-foreground" /></Button></form>
 								<a href={`/tasks/${task.id}`} class="min-w-0 flex-1"><p class="truncate text-sm font-medium hover:text-primary">{task.title}</p><p class="mt-1 truncate text-xs text-muted-foreground">{projectName(task.project_id)}</p></a>
-								<div class="hidden items-center gap-3 sm:flex"><Badge variant="outline" class={priorityClass(task.priority)}>{priorityLabel(task.priority)}</Badge><span class={`flex items-center gap-1.5 text-xs ${isOverdue(task.due_date, task.status) ? 'font-medium text-destructive' : 'text-muted-foreground'}`}><Clock3 class="size-3.5" /> {formatDate(task.due_date, { month: 'short', day: 'numeric' })}</span></div>
+								<div class="hidden items-center gap-4 sm:flex"><Badge variant="outline" class={priorityClass(task.priority)}>{priorityLabel(task.priority)}</Badge><span class={`flex items-center gap-1.5 text-xs ${overdueDateClass(isOverdue(task.due_date, task.status))}`}><CalendarDays class="size-3.5" /> {formatDate(task.due_date, { month: 'short', day: 'numeric' })}</span></div>
 							</div>
 						{/each}
 					</div>
@@ -129,8 +128,8 @@
 	<section>
 		<div class="mb-3 flex items-end justify-between"><h2 class="text-base font-semibold tracking-tight">Latest tasks</h2><a href="/tasks" class="text-xs font-medium text-muted-foreground hover:text-foreground">View all <ArrowUpRight class="ml-1 inline size-3" /></a></div>
 		<div class="overflow-hidden rounded-md border border-border bg-card">
-			{#each data.tasks.slice(0, 3) as task (task.id)}
-				<a href={`/tasks/${task.id}`} class="group flex items-center gap-4 border-b border-border px-4 py-3 last:border-0 transition-colors hover:bg-muted/40"><div class="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted"><CheckCircle2 class="size-4 text-muted-foreground" /></div><div class="min-w-0 flex-1"><h3 class="truncate text-sm font-medium group-hover:text-primary">{task.title}</h3><p class="mt-1 truncate text-xs text-muted-foreground">{projectName(task.project_id)} · {formatDate(task.created_at, { month: 'short', day: 'numeric' })}</p></div><div class="hidden items-center gap-3 sm:flex"><Badge variant="outline">{statusLabel(task.status)}</Badge><span class={`text-xs font-medium ${priorityClass(task.priority)}`}>{priorityLabel(task.priority)}</span></div></a>
+			{#each data.latestTasks as task (task.id)}
+				<a href={`/tasks/${task.id}`} class="group flex items-center gap-4 border-b border-border px-4 py-3 last:border-0 transition-colors hover:bg-muted/40"><div class="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted"><CheckCircle2 class="size-4 text-muted-foreground" /></div><div class="min-w-0 flex-1"><h3 class="truncate text-sm font-medium group-hover:text-primary">{task.title}</h3><p class="mt-1 truncate text-xs text-muted-foreground">{projectName(task.project_id)} · {formatDate(task.created_at, { month: 'short', day: 'numeric' })}</p></div><div class="hidden items-center gap-3 sm:flex"><Badge class={statusClass(task.status)}>{statusLabel(task.status)}</Badge><Badge variant="outline" class={priorityClass(task.priority)}>{priorityLabel(task.priority)}</Badge></div></a>
 			{:else}
 				<div class="flex flex-col items-center px-6 py-10 text-center"><CheckCircle2 class="size-6 text-muted-foreground" /><p class="mt-3 text-sm text-muted-foreground">No tasks yet. Your first one can start here.</p></div>
 			{/each}
