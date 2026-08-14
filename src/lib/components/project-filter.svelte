@@ -53,7 +53,7 @@
 	<Popover.Content align="start" class="w-80 max-w-[calc(100vw-2rem)] gap-0 overflow-hidden p-0">
 		<div class="flex items-center gap-2 border-b border-border px-3">
 			<Search class="size-3.5 shrink-0 text-muted-foreground" />
-			<input bind:value={searchQuery} aria-label="Search projects" placeholder="Search projects..." class="h-10 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
+			<input bind:value={searchQuery} autocomplete="off" aria-label="Search projects" placeholder="Search projects..." class="h-10 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
 		</div>
 		<div class="max-h-72 overflow-y-auto p-1" role="listbox" aria-label="Projects">
 			<a href={projectHref('all')} role="option" aria-selected={projectId === 'all'} onclick={closeAfterSelection} class="flex items-center gap-2 rounded-sm px-2 py-2 text-sm hover:bg-muted focus-visible:bg-muted focus-visible:outline-none">

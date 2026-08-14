@@ -59,7 +59,7 @@
 			<input type="hidden" name="project" value={data.projectId} />
 			<div class="relative">
 				<Search class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-				<Input name="q" value={data.query} placeholder="Search tasks..." aria-label="Search tasks" class="pr-9 pl-9" />
+				<Input name="q" value={data.query} autocomplete="off" placeholder="Search tasks..." aria-label="Search tasks" class="pr-9 pl-9" />
 				{#if data.query}
 					<a href={clearSearchHref()} aria-label="Clear search" class="absolute top-1/2 right-2 flex size-6 -translate-y-1/2 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"><X class="size-3.5" /></a>
 				{/if}
