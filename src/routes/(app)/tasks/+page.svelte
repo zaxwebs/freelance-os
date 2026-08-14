@@ -13,6 +13,7 @@
 	import PageHeader from '$lib/components/page-header.svelte';
 	import PaginationControls from '$lib/components/pagination-controls.svelte';
 	import QuickCreateDialog from '$lib/components/quick-create-dialog.svelte';
+	import TaskSectionNav from '$lib/components/task-section-nav.svelte';
 	import { formatDate, isOverdue, overdueDateClass, priorityClass, priorityLabel, statusClass, statusLabel } from '$lib/app/format';
 	import type { PageData } from './$types';
 
@@ -39,6 +40,8 @@
 	<PageHeader title="Tasks" description="A focused list of what moves the work forward.">
 		{#snippet actions()}<QuickCreateDialog kind="task" action="?/createTask" projects={data.projects} />{/snippet}
 	</PageHeader>
+
+	<TaskSectionNav active="tasks" />
 
 	<Card.Root class="bg-card py-0">
 		<Card.Content class="p-3 sm:p-4">
