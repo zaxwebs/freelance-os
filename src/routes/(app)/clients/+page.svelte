@@ -6,6 +6,7 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import UserRound from '@lucide/svelte/icons/user-round';
 	import Users from '@lucide/svelte/icons/users';
+	import X from '@lucide/svelte/icons/x';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import Input from '$lib/components/ui/input/input.svelte';
@@ -24,6 +25,10 @@
 		const projectIds = data.projects.filter((project) => project.client_id === id).map((project) => project.id);
 		return data.tasks.filter((task) => task.project_id && projectIds.includes(task.project_id)).length;
 	}
+
+	function clearSearchHref() {
+		return '/clients';
+	}
 </script>
 
 <svelte:head>
@@ -36,7 +41,18 @@
 		{#snippet actions()}<QuickCreateDialog kind="client" action="?/createClient" />{/snippet}
 	</PageHeader>
 
-	<Card.Root class="bg-card"><Card.Content class="p-3 sm:p-4"><form method="GET" class="relative max-w-lg"><Search class="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" /><Input name="q" value={data.query} placeholder="Search by name or company..." aria-label="Search clients" class="pl-9" /></form></Card.Content></Card.Root>
+
+	<div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+		<form method="GET" class="min-w-0 flex-1">
+			<div class="relative">
+				<Search class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+				<Input name="q" value={data.query} placeholder="Search clients..." aria-label="Search clients" class="pr-9 pl-9" />
+				{#if data.query}
+					<a href={clearSearchHref()} aria-label="Clear search" class="absolute top-1/2 right-2 flex size-6 -translate-y-1/2 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"><X class="size-3.5" /></a>
+				{/if}
+			</div>
+		</form>
+	</div>
 
 	<section class="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3"><MetricCard label="Clients" value={data.pagination.total} detail="Workspace total" icon={Users} tone="primary" /><MetricCard label="Projects" value={data.metrics.totalProjects} detail="Across clients" icon={FolderKanban} /><MetricCard label="Tracked tasks" value={data.metrics.totalTasks} detail="Connected work" icon={ListChecks} tone="emerald" /></section>
 

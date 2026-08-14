@@ -6,12 +6,14 @@
 	import ListFilter from '@lucide/svelte/icons/list-filter';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Search from '@lucide/svelte/icons/search';
+	import X from '@lucide/svelte/icons/x';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import PageHeader from '$lib/components/page-header.svelte';
 	import PaginationControls from '$lib/components/pagination-controls.svelte';
+	import ProjectFilter from '$lib/components/project-filter.svelte';
 	import QuickCreateDialog from '$lib/components/quick-create-dialog.svelte';
 	import TaskSectionNav from '$lib/components/task-section-nav.svelte';
 	import { formatDate, isOverdue, overdueDateClass, priorityClass, priorityLabel, statusClass, statusLabel } from '$lib/app/format';
@@ -21,6 +23,14 @@
 
 	function projectName(id: string | null) {
 		return data.projects.find((project) => project.id === id)?.name ?? 'Unassigned';
+	}
+
+	function clearSearchHref() {
+		const params = new URLSearchParams();
+		if (data.status !== 'all') params.set('status', data.status);
+		if (data.projectId !== 'all') params.set('project', data.projectId);
+		const search = params.toString();
+		return `/tasks${search ? `?${search}` : ''}`;
 	}
 
 	const filters = [
@@ -43,15 +53,20 @@
 
 	<TaskSectionNav active="tasks" />
 
-	<Card.Root class="bg-card py-0">
-		<Card.Content class="p-3 sm:p-4">
-			<form method="GET" class="grid gap-2 sm:grid-cols-[minmax(0,1fr)_190px_auto]">
-				<div class="relative"><Search class="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" /><Input name="q" value={data.query} placeholder="Search tasks..." aria-label="Search tasks" class="pl-9" /></div>
-				<select name="project" aria-label="Filter by project" class="h-9 rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20"><option value="all">All projects</option>{#each data.projects as project (project.id)}<option value={project.id} selected={data.projectId === project.id}>{project.name}</option>{/each}</select>
-				<Button variant="outline" size="sm" type="submit"><ListFilter class="size-3.5" /> Filter</Button>
-			</form>
-		</Card.Content>
-	</Card.Root>
+	<div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+		<form method="GET" class="min-w-0 flex-1">
+			<input type="hidden" name="status" value={data.status} />
+			<input type="hidden" name="project" value={data.projectId} />
+			<div class="relative">
+				<Search class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+				<Input name="q" value={data.query} placeholder="Search tasks..." aria-label="Search tasks" class="pr-9 pl-9" />
+				{#if data.query}
+					<a href={clearSearchHref()} aria-label="Clear search" class="absolute top-1/2 right-2 flex size-6 -translate-y-1/2 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"><X class="size-3.5" /></a>
+				{/if}
+			</div>
+		</form>
+		<ProjectFilter projects={data.projects} projectId={data.projectId} basePath="/tasks" query={data.query} status={data.status} />
+	</div>
 
 	<div class="space-y-2">
 	<Card.Root class="overflow-hidden gap-0 bg-card py-0">

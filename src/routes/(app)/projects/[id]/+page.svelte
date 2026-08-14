@@ -48,7 +48,7 @@
 
 		<div class="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
 			<Card.Root class="gap-0 bg-card py-0">
-				<Card.Header class="border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between"><div><Card.Title class="text-base">Project tasks</Card.Title><Card.Description class="mt-0.5 text-xs">Everything attached to this engagement.</Card.Description></div><a href="/tasks?project={project.id}" class="text-xs font-medium text-muted-foreground hover:text-foreground">Open queue</a></Card.Header>
+				<Card.Header class="border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between"><div><Card.Title class="text-base">Project tasks</Card.Title><Card.Description class="mt-0.5 text-xs">Everything attached to this engagement.</Card.Description></div><div class="flex items-center gap-3"><a href="/tasks?project={project.id}" class="text-xs font-medium text-muted-foreground hover:text-foreground">Open queue</a><a href={`/tasks/kanban?project=${project.id}`} class="text-xs font-medium text-muted-foreground hover:text-foreground">Open Kanban</a></div></Card.Header>
 				<Card.Content class="p-4">
 					{#if data.tasks.length === 0}
 						<div class="border border-dashed border-border px-5 py-8 text-center"><p class="text-sm text-muted-foreground">No tasks attached yet.</p><Button size="sm" class="mt-4" href="/tasks/new?project={project.id}"><Plus class="size-3.5" /> Add first task</Button></div>

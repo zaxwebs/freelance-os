@@ -28,7 +28,7 @@ export const load: PageServerLoad = async ({ locals: { supabase }, url }) => {
 
 	const [tasksResult, projectsResult] = await Promise.all([
 		tasksQuery.range((pagination.page - 1) * PAGE_SIZE, pagination.page * PAGE_SIZE - 1),
-		supabase.from('projects').select('*').order('name')
+		supabase.from('projects').select('*').order('created_at', { ascending: false }).order('id', { ascending: false })
 	]);
 	if (tasksResult.error) throw tasksResult.error;
 	if (projectsResult.error) throw projectsResult.error;

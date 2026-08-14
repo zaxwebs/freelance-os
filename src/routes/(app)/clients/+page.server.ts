@@ -11,13 +11,13 @@ export const load: PageServerLoad = async ({ locals: { supabase }, url }) => {
 	const query = url.searchParams.get('q')?.trim() ?? '';
 	const requestedPage = parsePage(url.searchParams.get('page'));
 	let clientCountQuery = supabase.from('clients').select('*', { count: 'exact', head: true });
-	if (query) clientCountQuery = clientCountQuery.or(`name.ilike.%${query}%,company.ilike.%${query}%`);
+	if (query) clientCountQuery = clientCountQuery.or(`name.ilike.%${query}%,company.ilike.%${query}%,email.ilike.%${query}%`);
 	const clientCountResult = await clientCountQuery;
 	if (clientCountResult.error) throw clientCountResult.error;
 
 	const pagination = getPagination(requestedPage, clientCountResult.count ?? 0, PAGE_SIZE);
 	let clientsQuery = supabase.from('clients').select('*').order('created_at', { ascending: false }).range((pagination.page - 1) * PAGE_SIZE, pagination.page * PAGE_SIZE - 1);
-	if (query) clientsQuery = clientsQuery.or(`name.ilike.%${query}%,company.ilike.%${query}%`);
+	if (query) clientsQuery = clientsQuery.or(`name.ilike.%${query}%,company.ilike.%${query}%,email.ilike.%${query}%`);
 
 	const [clientsResult, projectCountResult, taskCountResult] = await Promise.all([
 		clientsQuery,
