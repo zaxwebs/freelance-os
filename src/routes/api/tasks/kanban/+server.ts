@@ -9,6 +9,7 @@ export const GET: RequestHandler = async ({ locals: { supabase }, url }) => {
 	if (!user) return json({ message: 'Sign in to load more tasks.' }, { status: 401 });
 
 	const status = url.searchParams.get('status') ?? '';
+	const projectId = url.searchParams.get('project')?.trim() || 'all';
 	const requestedOffset = Number.parseInt(url.searchParams.get('offset') ?? '0', 10);
 	const offset = Number.isFinite(requestedOffset) && requestedOffset >= 0 ? requestedOffset : 0;
 
@@ -16,14 +17,13 @@ export const GET: RequestHandler = async ({ locals: { supabase }, url }) => {
 		return json({ message: 'Invalid task status.' }, { status: 400 });
 	}
 
-	const { data, count, error } = await supabase
-		.from('tasks')
-		.select('*', { count: 'exact' })
-	.eq('user_id', user.id)
-	.eq('status', status)
-	.order('created_at', { ascending: false })
-	.order('id', { ascending: false })
-	.range(offset, offset + PAGE_SIZE - 1);
+	let taskQuery = supabase.from('tasks').select('*', { count: 'exact' }).eq('user_id', user.id).eq('status', status);
+	if (projectId !== 'all') taskQuery = taskQuery.eq('project_id', projectId);
+
+	const { data, count, error } = await taskQuery
+		.order('created_at', { ascending: false })
+		.order('id', { ascending: false })
+		.range(offset, offset + PAGE_SIZE - 1);
 
 	if (error) return json({ message: error.message }, { status: 500 });
 

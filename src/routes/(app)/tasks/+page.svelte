@@ -38,7 +38,7 @@
 
 <div class="space-y-6">
 	<PageHeader title="Tasks" description="A focused list of what moves the work forward.">
-		{#snippet actions()}<QuickCreateDialog kind="task" action="?/createTask" projects={data.projects} />{/snippet}
+		{#snippet actions()}<QuickCreateDialog kind="task" action="?/createTask" projects={data.projects} defaultProjectId={data.projectId === 'all' ? undefined : data.projectId} />{/snippet}
 	</PageHeader>
 
 	<TaskSectionNav active="tasks" />

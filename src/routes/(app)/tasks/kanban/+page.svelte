@@ -4,6 +4,7 @@
 	import CalendarDays from '@lucide/svelte/icons/calendar-days';
 	import Circle from '@lucide/svelte/icons/circle';
 	import GripVertical from '@lucide/svelte/icons/grip-vertical';
+	import ListFilter from '@lucide/svelte/icons/list-filter';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import Plus from '@lucide/svelte/icons/plus';
 	import { flip } from 'svelte/animate';
@@ -62,7 +63,29 @@
 	let hasMore = $state<Record<TaskStatus, boolean>>(createInitialHasMore());
 	let loading = $state<Record<TaskStatus, boolean>>({ todo: false, in_progress: false, done: false });
 	let saveError = $state('');
+	let loadedProjectId: string | null = null;
 	const flipDurationMs = 150;
+
+	function resetBoard() {
+		board = createInitialBoard();
+		taskCounts = createInitialTaskCounts();
+		nextOffsets = createInitialOffsets();
+		hasMore = createInitialHasMore();
+		loading = { todo: false, in_progress: false, done: false };
+		saveError = '';
+	}
+
+	async function refreshBoard() {
+		await invalidateAll();
+		resetBoard();
+	}
+
+	$effect(() => {
+		if (loadedProjectId === data.projectId) return;
+
+		loadedProjectId = data.projectId;
+		resetBoard();
+	});
 
 	function projectName(id: string | null) {
 		return data.projects.find((project) => project.id === id)?.name ?? 'Unassigned';
@@ -106,7 +129,9 @@
 
 		loading[status] = true;
 		try {
-			const response = await fetch(`/api/tasks/kanban?status=${status}&offset=${nextOffsets[status]}`);
+			const params = new URLSearchParams({ status, offset: String(nextOffsets[status]) });
+			if (data.projectId !== 'all') params.set('project', data.projectId);
+			const response = await fetch(`/api/tasks/kanban?${params}`);
 			if (!response.ok) throw new Error('Unable to load more tasks.');
 
 			const result: { tasks: Task[]; total: number; hasMore: boolean } = await response.json();
@@ -131,9 +156,24 @@
 
 <div class="space-y-6">
 	<PageHeader title="Kanban" description="Move work through the stages that matter.">
-		{#snippet actions()}<QuickCreateDialog kind="task" action="/tasks?/createTask" projects={data.projects} label="Add task" />{/snippet}
+		{#snippet actions()}<QuickCreateDialog kind="task" action="/tasks?/createTask" projects={data.projects} defaultProjectId={data.projectId === 'all' ? undefined : data.projectId} onSuccess={refreshBoard} label="Add task" />{/snippet}
 	</PageHeader>
 	<TaskSectionNav active="kanban" />
+
+	<Card.Root class="bg-card py-0">
+		<Card.Content class="p-3 sm:p-4">
+			<form method="GET" class="flex flex-col gap-2 sm:flex-row sm:items-center">
+				<label for="kanban-project" class="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Project</label>
+				<select id="kanban-project" name="project" aria-label="Filter by project" class="h-9 min-w-0 flex-1 rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20">
+					<option value="all">All projects</option>
+					{#each data.projects as project (project.id)}
+						<option value={project.id} selected={data.projectId === project.id}>{project.name}</option>
+					{/each}
+				</select>
+				<Button variant="outline" size="sm" type="submit"><ListFilter class="size-3.5" /> Filter</Button>
+			</form>
+		</Card.Content>
+	</Card.Root>
 
 	{#if saveError}
 		<div role="alert" class="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">{saveError}</div>
@@ -180,7 +220,7 @@
 	</div>
 
 	{#if data.tasks.length === 0}
-		<div class="flex flex-col items-center rounded-md border border-dashed border-border px-6 py-10 text-center"><p class="text-sm font-medium">No tasks yet</p><p class="mt-1 text-xs text-muted-foreground">Create your first task to start using the board.</p><Button class="mt-4" size="sm" href="/tasks/new"><Plus class="size-3.5" /> Add task</Button></div>
+		<div class="flex flex-col items-center rounded-md border border-dashed border-border px-6 py-10 text-center"><p class="text-sm font-medium">{data.projectId === 'all' ? 'No tasks yet' : 'No tasks in this project'}</p><p class="mt-1 text-xs text-muted-foreground">{data.projectId === 'all' ? 'Create your first task to start using the board.' : 'Choose another project or return to the full board.'}</p>{#if data.projectId === 'all'}<Button class="mt-4" size="sm" href="/tasks/new"><Plus class="size-3.5" /> Add task</Button>{:else}<Button class="mt-4" size="sm" variant="outline" href="/tasks/kanban">Show all projects</Button>{/if}</div>
 	{:else}
 		<a href="/tasks" class="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground">Open task list <ArrowUpRight class="size-3.5" /></a>
 	{/if}

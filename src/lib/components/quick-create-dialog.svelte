@@ -23,6 +23,7 @@
 		clients?: ClientOption[];
 		defaultProjectId?: string;
 		defaultClientId?: string;
+		onSuccess?: () => void | Promise<void>;
 		label?: string;
 		variant?: ButtonVariant;
 	}
@@ -34,6 +35,7 @@
 		clients = [],
 		defaultProjectId = '',
 		defaultClientId = '',
+		onSuccess,
 		label,
 		variant = 'default'
 	}: Props = $props();
@@ -82,6 +84,7 @@
 					}
 					open = false;
 					await update();
+					await onSuccess?.();
 				};
 			}}
 		>
