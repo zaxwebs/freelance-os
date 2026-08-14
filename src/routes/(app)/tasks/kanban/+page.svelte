@@ -2,17 +2,20 @@
 	import { invalidateAll } from '$app/navigation';
 	import ArrowUpRight from '@lucide/svelte/icons/arrow-up-right';
 	import CalendarDays from '@lucide/svelte/icons/calendar-days';
+	import Check from '@lucide/svelte/icons/check';
 	import Circle from '@lucide/svelte/icons/circle';
+	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import GripVertical from '@lucide/svelte/icons/grip-vertical';
-	import ListFilter from '@lucide/svelte/icons/list-filter';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import Plus from '@lucide/svelte/icons/plus';
+	import Search from '@lucide/svelte/icons/search';
 	import { flip } from 'svelte/animate';
 	import { dndzone } from 'svelte-dnd-action';
 	import type { DndEvent } from 'svelte-dnd-action';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card';
+	import * as Popover from '$lib/components/ui/popover';
 	import PageHeader from '$lib/components/page-header.svelte';
 	import QuickCreateDialog from '$lib/components/quick-create-dialog.svelte';
 	import TaskSectionNav from '$lib/components/task-section-nav.svelte';
@@ -64,7 +67,12 @@
 	let loading = $state<Record<TaskStatus, boolean>>({ todo: false, in_progress: false, done: false });
 	let saveError = $state('');
 	let loadedProjectId: string | null = null;
+	let projectFilterOpen = $state(false);
+	let projectQuery = $state('');
 	const flipDurationMs = 150;
+	let filteredProjects = $derived(
+		data.projects.filter((project) => project.name.toLowerCase().includes(projectQuery.trim().toLowerCase()))
+	);
 
 	function resetBoard() {
 		board = createInitialBoard();
@@ -89,6 +97,10 @@
 
 	function projectName(id: string | null) {
 		return data.projects.find((project) => project.id === id)?.name ?? 'Unassigned';
+	}
+
+	function projectHref(id: string) {
+		return id === 'all' ? '/tasks/kanban' : `/tasks/kanban?project=${encodeURIComponent(id)}`;
 	}
 
 	function handleConsider(status: TaskStatus, event: CustomEvent<DndEvent<Task>>) {
@@ -160,20 +172,42 @@
 	</PageHeader>
 	<TaskSectionNav active="kanban" />
 
-	<Card.Root class="bg-card py-0">
-		<Card.Content class="p-3 sm:p-4">
-			<form method="GET" class="flex flex-col gap-2 sm:flex-row sm:items-center">
-				<label for="kanban-project" class="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Project</label>
-				<select id="kanban-project" name="project" aria-label="Filter by project" class="h-9 min-w-0 flex-1 rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/20">
-					<option value="all">All projects</option>
-					{#each data.projects as project (project.id)}
-						<option value={project.id} selected={data.projectId === project.id}>{project.name}</option>
+	<div class="flex flex-wrap items-center gap-2 border-b border-border/70 pb-4">
+		<span class="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Filter</span>
+		<Popover.Root bind:open={projectFilterOpen}>
+			<Popover.Trigger>
+				{#snippet child({ props })}
+					<Button {...props} variant="outline" size="sm" class="max-w-full justify-between gap-2 sm:min-w-64">
+						<span class="flex min-w-0 items-center gap-1.5">
+							<span class="text-muted-foreground">Project:</span>
+							<span class="truncate">{data.projectId === 'all' ? 'All projects' : projectName(data.projectId)}</span>
+						</span>
+						<ChevronDown class="size-3.5 shrink-0 text-muted-foreground" />
+					</Button>
+				{/snippet}
+			</Popover.Trigger>
+			<Popover.Content align="start" class="w-80 max-w-[calc(100vw-2rem)] gap-0 overflow-hidden p-0">
+				<div class="flex items-center gap-2 border-b border-border px-3">
+					<Search class="size-3.5 shrink-0 text-muted-foreground" />
+					<input bind:value={projectQuery} aria-label="Search projects" placeholder="Search projects..." class="h-10 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
+				</div>
+				<div class="max-h-72 overflow-y-auto p-1" role="listbox" aria-label="Projects">
+					<a href={projectHref('all')} role="option" aria-selected={data.projectId === 'all'} onclick={() => { projectFilterOpen = false; projectQuery = ''; }} class="flex items-center gap-2 rounded-sm px-2 py-2 text-sm hover:bg-muted focus-visible:bg-muted focus-visible:outline-none">
+						<Check class={`size-3.5 shrink-0 ${data.projectId === 'all' ? 'opacity-100' : 'opacity-0'}`} />
+						<span>All projects</span>
+					</a>
+					{#each filteredProjects as project (project.id)}
+						<a href={projectHref(project.id)} role="option" aria-selected={data.projectId === project.id} onclick={() => { projectFilterOpen = false; projectQuery = ''; }} class="flex items-center gap-2 rounded-sm px-2 py-2 text-sm hover:bg-muted focus-visible:bg-muted focus-visible:outline-none">
+							<Check class={`size-3.5 shrink-0 ${data.projectId === project.id ? 'opacity-100' : 'opacity-0'}`} />
+							<span class="truncate">{project.name}</span>
+						</a>
+					{:else}
+						<p class="px-2 py-6 text-center text-xs text-muted-foreground">No projects match your search.</p>
 					{/each}
-				</select>
-				<Button variant="outline" size="sm" type="submit"><ListFilter class="size-3.5" /> Filter</Button>
-			</form>
-		</Card.Content>
-	</Card.Root>
+				</div>
+			</Popover.Content>
+		</Popover.Root>
+	</div>
 
 	{#if saveError}
 		<div role="alert" class="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">{saveError}</div>

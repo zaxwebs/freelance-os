@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ locals: { supabase }, url }) => {
 		taskQuery('todo'),
 		taskQuery('in_progress'),
 		taskQuery('done'),
-		supabase.from('projects').select('*').order('name')
+		supabase.from('projects').select('*').order('created_at', { ascending: false }).order('id', { ascending: false })
 	]);
 
 	if (todoResult.error) throw todoResult.error;
