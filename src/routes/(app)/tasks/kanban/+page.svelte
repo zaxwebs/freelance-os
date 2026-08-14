@@ -183,7 +183,7 @@
 					<div
 						aria-label={`${column.label} tasks`}
 						class="flex min-h-32 flex-1 flex-col space-y-3 rounded-md"
-						use:dndzone={{ items: board[column.value], type: 'task-status', flipDurationMs, delayTouchStart: 150 }}
+						use:dndzone={{ items: board[column.value], type: 'task-status', flipDurationMs, delayTouchStart: 150, dropTargetStyle: { outline: '2px solid rgba(12, 102, 228, 0.25)', outlineOffset: '2px' } }}
 						onconsider={(event) => handleConsider(column.value, event)}
 						onfinalize={(event) => handleFinalize(column.value, event)}
 					>
