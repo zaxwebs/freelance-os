@@ -37,7 +37,7 @@
 				<Trash2 class="mt-0.5 size-4 shrink-0" />
 				<div class="min-w-0 space-y-1">
 					<p class="truncate text-sm font-medium">{itemName}</p>
-					<p class="text-xs leading-5 text-foreground/75">{detail}</p>
+					<p class="text-xs leading-5 text-destructive">{detail}</p>
 				</div>
 			</div>
 
