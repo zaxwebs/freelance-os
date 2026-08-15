@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
-	import ArrowUpRight from '@lucide/svelte/icons/arrow-up-right';
 	import CalendarDays from '@lucide/svelte/icons/calendar-days';
 	import Circle from '@lucide/svelte/icons/circle';
 	import GripVertical from '@lucide/svelte/icons/grip-vertical';
@@ -211,7 +210,5 @@
 
 	{#if data.tasks.length === 0}
 		<div class="flex flex-col items-center rounded-md border border-dashed border-border px-6 py-10 text-center"><p class="text-sm font-medium">{data.projectId === 'all' ? 'No tasks yet' : 'No tasks in this project'}</p><p class="mt-1 text-xs text-muted-foreground">{data.projectId === 'all' ? 'Create your first task to start using the board.' : 'Choose another project or return to the full board.'}</p>{#if data.projectId === 'all'}<Button class="mt-4" size="sm" href="/tasks/new"><Plus class="size-3.5" /> Add task</Button>{:else}<Button class="mt-4" size="sm" variant="outline" href="/tasks/kanban">Show all projects</Button>{/if}</div>
-	{:else}
-		<a href="/tasks" class="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground">Open task list <ArrowUpRight class="size-3.5" /></a>
 	{/if}
 </div>

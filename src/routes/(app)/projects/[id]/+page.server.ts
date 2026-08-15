@@ -5,17 +5,21 @@ import { convertBaseAmount, defaultFinanceCurrency, getDisplayCurrency, getDispl
 
 export const load: PageServerLoad = async ({ locals: { supabase }, params }) => {
 	const user = await getCurrentUser(supabase);
-	if (!user) return { project: null, tasks: [], clients: [], invoices: [], expenses: [], displayCurrency: 'USD', financeMetrics: { invoiced: 0, paid: 0, outstanding: 0, expenses: 0, profit: 0 } };
-	const [{ project, tasks }, clientsResult, invoicesResult, expensesResult, displayCurrency] = await Promise.all([
+	if (!user) return { project: null, tasks: [], clients: [], invoices: [], expenses: [], contract: null, contractTemplates: [], displayCurrency: 'USD', financeMetrics: { invoiced: 0, paid: 0, outstanding: 0, expenses: 0, profit: 0 } };
+	const [{ project, tasks }, clientsResult, invoicesResult, expensesResult, contractResult, contractTemplatesResult, displayCurrency] = await Promise.all([
 		getProjectData(supabase, params.id),
 		supabase.from('clients').select('*').order('name'),
 		supabase.from('invoices').select('*').eq('project_id', params.id).order('issue_date', { ascending: false }),
 		supabase.from('finance_expenses').select('*').eq('project_id', params.id).order('expense_date', { ascending: false }),
+		supabase.from('contracts').select('id,project_id,name,start_date,end_date,status,content,template_id,created_at,updated_at').eq('project_id', params.id).maybeSingle(),
+		supabase.from('contract_templates').select('id,name').order('created_at', { ascending: true }),
 		getDisplayCurrency(supabase, user.id)
 	]);
 	if (clientsResult.error) throw clientsResult.error;
 	if (invoicesResult.error) throw invoicesResult.error;
 	if (expensesResult.error) throw expensesResult.error;
+	if (contractResult.error) throw contractResult.error;
+	if (contractTemplatesResult.error) throw contractTemplatesResult.error;
 	if (!project) error(404, 'Project not found');
 	const displayRate = await getExchangeRate(supabase, user.id, defaultFinanceCurrency, displayCurrency);
 	const invoices = (invoicesResult.data ?? []).map((invoice) => ({ ...invoice, displayStatus: getDisplayInvoiceStatus(invoice.status, invoice.due_date, Number(invoice.amount_paid), Number(invoice.total)), displayTotal: convertBaseAmount(invoice.base_total, displayRate.rate, displayCurrency), displayAmountPaid: convertBaseAmount(invoice.base_amount_paid, displayRate.rate, displayCurrency) }));
@@ -23,7 +27,7 @@ export const load: PageServerLoad = async ({ locals: { supabase }, params }) => 
 	const invoiced = invoices.filter((invoice) => invoice.displayStatus !== 'void').reduce((sum, invoice) => sum + invoice.displayTotal, 0);
 	const paid = invoices.reduce((sum, invoice) => sum + invoice.displayAmountPaid, 0);
 	const expenseTotal = expenses.reduce((sum, expense) => sum + expense.displayAmount, 0);
-	return { project, tasks, clients: clientsResult.data ?? [], invoices, expenses, displayCurrency, financeMetrics: { invoiced, paid, outstanding: invoiced - paid, expenses: expenseTotal, profit: paid - expenseTotal } };
+	return { project, tasks, clients: clientsResult.data ?? [], invoices, expenses, contract: contractResult.data ?? null, contractTemplates: contractTemplatesResult.data ?? [], displayCurrency, financeMetrics: { invoiced, paid, outstanding: invoiced - paid, expenses: expenseTotal, profit: paid - expenseTotal } };
 };
 
 export const actions: Actions = {

@@ -63,7 +63,7 @@
 		{ href: '/projects', label: 'Projects', icon: FolderKanban },
 		{ href: '/clients', label: 'Clients', icon: Users },
 		{ href: '/proposals', label: 'Proposals', icon: Scroll },
-		{ href: '/contracts/templates', label: 'Contracts', icon: ClipboardPenLine },
+		{ href: '/contracts', label: 'Contracts', icon: ClipboardPenLine },
 		{ href: '/finance', label: 'Finance', icon: Banknote },
 		{ href: '/invoices', label: 'Invoices', icon: ReceiptText },
 		{ href: '/expenses', label: 'Expenses', icon: WalletCards }

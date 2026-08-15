@@ -9,7 +9,7 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
 	const { data: templates, error } = await supabase
 		.from('contract_templates')
 		.select('id,name')
-		.order('name');
+		.order('created_at', { ascending: true });
 	if (error) throw error;
 
 	return { templates: templates ?? [] };

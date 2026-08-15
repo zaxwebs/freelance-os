@@ -5,6 +5,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import DeleteConfirmDialog from '$lib/components/delete-confirm-dialog.svelte';
+	import ContractSectionNav from '$lib/components/contract-section-nav.svelte';
 	import PageHeader from '$lib/components/page-header.svelte';
 	import type { PageData } from './$types';
 
@@ -20,6 +21,7 @@
 	<PageHeader title="Contract templates" description="Reusable agreements for your projects.">
 		{#snippet actions()}<Button href="/contracts/templates/new" size="sm" class="gap-1.5"><Plus class="size-3.5" /> New template</Button>{/snippet}
 	</PageHeader>
+	<ContractSectionNav active="templates" />
 
 	<Card.Root class="gap-0 bg-card py-0">
 		<Card.Header class="border-b border-border px-4 py-3 sm:px-5">

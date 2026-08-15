@@ -31,6 +31,7 @@ export function statusLabel(status: string) {
 		completed: 'Completed',
 		archived: 'Archived',
 		draft: 'Draft',
+		ended: 'Ended',
 		sent: 'Sent',
 		viewed: 'Viewed',
 		partially_paid: 'Partially paid',

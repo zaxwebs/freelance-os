@@ -38,6 +38,63 @@ export type Database = {
         }
         Relationships: []
       }
+      contracts: {
+        Row: {
+          content: string
+          created_at: string
+          end_date: string | null
+          id: string
+          name: string
+          project_id: string
+          start_date: string | null
+          status: string
+          template_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          name: string
+          project_id: string
+          start_date?: string | null
+          status?: string
+          template_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          name?: string
+          project_id?: string
+          start_date?: string | null
+          status?: string
+          template_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contracts_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "contract_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           billing_address: string | null

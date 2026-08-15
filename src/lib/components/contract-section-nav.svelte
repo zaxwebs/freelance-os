@@ -1,0 +1,26 @@
+<script lang="ts">
+	type ContractSection = 'contracts' | 'templates';
+
+	interface Props {
+		active: ContractSection;
+	}
+
+	let { active }: Props = $props();
+
+	const items: Array<{ id: ContractSection; label: string; href: string }> = [
+		{ id: 'contracts', label: 'Contracts', href: '/contracts' },
+		{ id: 'templates', label: 'Templates', href: '/contracts/templates' }
+	];
+</script>
+
+<nav aria-label="Contract views" class="flex items-center gap-1 overflow-x-auto">
+	{#each items as item (item.id)}
+		<a
+			href={item.href}
+			aria-current={active === item.id ? 'page' : undefined}
+			class={`border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors ${active === item.id ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground'}`}
+		>
+			{item.label}
+		</a>
+	{/each}
+</nav>

@@ -4,11 +4,13 @@
 	import ArchiveRestore from '@lucide/svelte/icons/archive-restore';
 	import CalendarDays from '@lucide/svelte/icons/calendar-days';
 	import CheckCircle2 from '@lucide/svelte/icons/check-circle-2';
+	import ClipboardPenLine from '@lucide/svelte/icons/clipboard-pen-line';
 	import Circle from '@lucide/svelte/icons/circle';
 	import FolderKanban from '@lucide/svelte/icons/folder-kanban';
 	import ListChecks from '@lucide/svelte/icons/list-checks';
 	import Plus from '@lucide/svelte/icons/plus';
 	import ReceiptText from '@lucide/svelte/icons/receipt-text';
+	import FilePenLine from '@lucide/svelte/icons/file-pen-line';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card';
@@ -45,6 +47,20 @@
 		</header>
 
 		<section class="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3"><MetricCard label="Progress" value={`${progress}%`} detail={`${done} of ${total} done`} tone="primary" /><MetricCard label="Tasks" value={total} detail={`${done} completed`} icon={ListChecks} /><MetricCard label="Open work" value={total - done} detail="Keep momentum" tone="amber" /></section>
+
+		<section class="overflow-hidden rounded-md border border-border bg-card">
+			<div class="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+				<div class="flex items-start gap-2.5"><span class="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-md bg-muted"><ClipboardPenLine class="size-3.5 text-muted-foreground" /></span><div><h2 class="text-sm font-medium">Contract</h2><p class="mt-0.5 text-xs text-muted-foreground">Keep the agreement attached to this project.</p></div></div>
+				{#if data.contract}<Badge class={statusClass(data.contract.status)}>{statusLabel(data.contract.status)}</Badge>{/if}
+			</div>
+			<div class="border-t border-border px-4 py-3">
+				{#if data.contract}
+					<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div class="min-w-0"><p class="truncate text-sm font-semibold">{data.contract.name}</p><p class="mt-1 text-xs text-muted-foreground">{data.contract.start_date ? formatDate(data.contract.start_date, { month: 'short', day: 'numeric', year: 'numeric' }) : 'No start date'}{data.contract.end_date ? ` – ${formatDate(data.contract.end_date, { month: 'short', day: 'numeric', year: 'numeric' })}` : ''}</p></div><div class="flex flex-wrap gap-2"><Button href={`/projects/${project.id}/contracts/${data.contract.id}`} variant="outline" size="sm">View contract</Button><Button href={`/projects/${project.id}/contracts/${data.contract.id}/edit`} size="sm"><FilePenLine class="size-3.5" /> Edit</Button></div></div>
+				{:else}
+					<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><p class="text-sm text-muted-foreground">No contract yet. Start with a reusable template or a blank agreement.</p><Button href={`/projects/${project.id}/contracts/new`} size="sm"><FilePenLine class="size-3.5" /> Add contract</Button></div>
+				{/if}
+			</div>
+		</section>
 
 		<div class="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
 			<Card.Root class="gap-0 bg-card py-0">
