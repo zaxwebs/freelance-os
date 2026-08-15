@@ -5,19 +5,21 @@
 
 	interface Props {
 		action: string;
+		hiddenFields?: Record<string, string>;
 		itemName: string;
 		itemType: string;
 		detail: string;
+		triggerIconOnly?: boolean;
 	}
 
-	let { action, itemName, itemType, detail }: Props = $props();
+	let { action, hiddenFields = {}, itemName, itemType, detail, triggerIconOnly = false }: Props = $props();
 	let open = $state(false);
 </script>
 
 <Dialog.Root bind:open>
 	<Dialog.Trigger>
 		{#snippet child({ props })}
-			<Button {...props} variant="outline" size="sm" class="text-destructive hover:text-destructive"><Trash2 class="size-3.5" /> Delete</Button>
+			<Button {...props} variant={triggerIconOnly ? 'ghost' : 'outline'} size={triggerIconOnly ? 'icon-xs' : 'sm'} class="text-destructive hover:text-destructive" aria-label={triggerIconOnly ? `Delete ${itemName}` : undefined} title={triggerIconOnly ? `Delete ${itemName}` : undefined}><Trash2 class="size-3.5" />{#if !triggerIconOnly} Delete{/if}</Button>
 		{/snippet}
 	</Dialog.Trigger>
 
@@ -28,6 +30,9 @@
 		</Dialog.Header>
 
 		<form method="POST" {action} class="space-y-4 px-5 py-4">
+			{#each Object.entries(hiddenFields) as [name, value]}
+				<input type="hidden" {name} {value} />
+			{/each}
 			<div class="flex gap-3 rounded-md border border-destructive/25 bg-destructive/5 px-3 py-3 text-destructive">
 				<Trash2 class="mt-0.5 size-4 shrink-0" />
 				<div class="min-w-0 space-y-1">

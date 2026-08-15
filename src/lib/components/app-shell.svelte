@@ -4,6 +4,7 @@
 	import Bell from '@lucide/svelte/icons/bell';
 	import CircleHelp from '@lucide/svelte/icons/circle-help';
 	import Banknote from '@lucide/svelte/icons/banknote';
+	import ClipboardPenLine from '@lucide/svelte/icons/clipboard-pen-line';
 	import FolderKanban from '@lucide/svelte/icons/folder-kanban';
 	import LayoutDashboard from '@lucide/svelte/icons/layout-dashboard';
 	import ListChecks from '@lucide/svelte/icons/list-checks';
@@ -43,8 +44,10 @@
 						? 'Finance'
 			: page.url.pathname.startsWith('/invoices')
 					? 'Invoices'
-			: page.url.pathname.startsWith('/proposals')
+					: page.url.pathname.startsWith('/proposals')
 					? 'Proposals'
+			: page.url.pathname.startsWith('/contracts')
+					? 'Contracts'
 			: page.url.pathname.startsWith('/expenses')
 						? 'Expenses'
 					: page.url.pathname.startsWith('/search')
@@ -60,6 +63,7 @@
 		{ href: '/projects', label: 'Projects', icon: FolderKanban },
 		{ href: '/clients', label: 'Clients', icon: Users },
 		{ href: '/proposals', label: 'Proposals', icon: Scroll },
+		{ href: '/contracts/templates', label: 'Contracts', icon: ClipboardPenLine },
 		{ href: '/finance', label: 'Finance', icon: Banknote },
 		{ href: '/invoices', label: 'Invoices', icon: ReceiptText },
 		{ href: '/expenses', label: 'Expenses', icon: WalletCards }
