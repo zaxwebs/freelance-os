@@ -42,11 +42,9 @@ export type Database = {
         Row: {
           content: string
           created_at: string
-          end_date: string | null
           id: string
           name: string
           project_id: string
-          start_date: string | null
           status: string
           template_id: string | null
           updated_at: string
@@ -55,11 +53,9 @@ export type Database = {
         Insert: {
           content?: string
           created_at?: string
-          end_date?: string | null
           id?: string
           name: string
           project_id: string
-          start_date?: string | null
           status?: string
           template_id?: string | null
           updated_at?: string
@@ -68,11 +64,9 @@ export type Database = {
         Update: {
           content?: string
           created_at?: string
-          end_date?: string | null
           id?: string
           name?: string
           project_id?: string
-          start_date?: string | null
           status?: string
           template_id?: string | null
           updated_at?: string

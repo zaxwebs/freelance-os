@@ -1,23 +1,21 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Bold from '@lucide/svelte/icons/bold';
-	import CalendarDays from '@lucide/svelte/icons/calendar-days';
 	import Heading2 from '@lucide/svelte/icons/heading-2';
 	import Italic from '@lucide/svelte/icons/italic';
 	import List from '@lucide/svelte/icons/list';
 	import ListOrdered from '@lucide/svelte/icons/list-ordered';
 	import Underline from '@lucide/svelte/icons/underline';
+	import { contractPlaceholderDefinitions, type ContractPlaceholderSummary } from '$lib/app/contract-placeholders';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card';
-	import DatePicker from '$lib/components/date-picker.svelte';
+	import ContractPlaceholderNotice from '$lib/components/contract-placeholder-notice.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { statusLabel } from '$lib/app/format';
 
 	interface ContractValues {
 		content?: string;
-		end_date?: string | null;
 		name?: string;
-		start_date?: string | null;
 		status?: string;
 	}
 
@@ -26,21 +24,18 @@
 		cancelHref: string;
 		formMessage?: string;
 		initial?: ContractValues;
+		placeholderSummary?: ContractPlaceholderSummary;
 		projectName: string;
 		submitLabel?: string;
 	}
 
-	let { action, cancelHref, formMessage, initial = {}, projectName, submitLabel = 'Save changes' }: Props = $props();
+	let { action, cancelHref, formMessage, initial = {}, placeholderSummary, projectName, submitLabel = 'Save changes' }: Props = $props();
 	let content = $state('');
-	let startDate = $state<string | null>(null);
-	let endDate = $state<string | null>(null);
 	let status = $state('draft');
 	let editor: HTMLDivElement | null = null;
 
 	onMount(() => {
 		content = initial.content ?? '';
-		startDate = initial.start_date ?? null;
-		endDate = initial.end_date ?? null;
 		status = initial.status ?? 'draft';
 		if (editor) editor.innerHTML = content;
 	});
@@ -65,6 +60,7 @@
 <form method="POST" {action} class="grid gap-4 xl:grid-cols-[minmax(0,1fr)_300px]" onsubmit={syncContent}>
 	<input type="hidden" name="content" value={content} />
 	<div class="space-y-4">
+		{#if placeholderSummary}<ContractPlaceholderNotice summary={placeholderSummary} />{/if}
 		<Card.Root class="gap-0 bg-card py-0">
 			<Card.Header class="border-b border-border px-4 py-3 sm:px-5"><Card.Title class="text-base">{projectName} - Contract</Card.Title><Card.Description class="mt-0.5 text-xs">Edit the agreement that belongs to this project.</Card.Description></Card.Header>
 			<Card.Content class="p-4 sm:p-5">
@@ -85,9 +81,9 @@
 		</Card.Root>
 
 		<Card.Root class="gap-0 bg-card py-0">
-			<Card.Header class="border-b border-border px-4 py-3 sm:px-5"><Card.Title class="text-base">Insert placeholder</Card.Title><Card.Description class="mt-0.5 text-xs">Use reusable details while you finish the agreement.</Card.Description></Card.Header>
+			<Card.Header class="border-b border-border px-4 py-3 sm:px-5"><Card.Title class="text-base">Insert smart field</Card.Title><Card.Description class="mt-0.5 text-xs">Smart fields resolve to current project details when the contract is viewed.</Card.Description></Card.Header>
 			<Card.Content class="flex flex-wrap gap-1.5 p-4 sm:p-5">
-				{#each [{ label: 'Client name', value: 'client_name' }, { label: 'Project name', value: 'project_name' }, { label: 'Freelancer name', value: 'freelancer_name' }, { label: 'Start date', value: 'start_date' }, { label: 'End date', value: 'end_date' }] as placeholder (placeholder.value)}
+				{#each contractPlaceholderDefinitions as placeholder (placeholder.value)}
 					<button type="button" class="rounded-md border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30" onclick={() => insertPlaceholder(placeholder.value)}>{placeholder.label}</button>
 				{/each}
 			</Card.Content>
@@ -95,12 +91,9 @@
 	</div>
 
 	<Card.Root class="h-fit gap-0 bg-card py-0 xl:sticky xl:top-20">
-		<Card.Header class="border-b border-border px-4 py-3"><Card.Title class="text-base">Contract details</Card.Title><Card.Description class="mt-0.5 text-xs">Keep the lifecycle and dates easy to scan.</Card.Description></Card.Header>
+		<Card.Header class="border-b border-border px-4 py-3"><Card.Title class="text-base">Contract details</Card.Title><Card.Description class="mt-0.5 text-xs">Keep the lifecycle easy to scan.</Card.Description></Card.Header>
 		<Card.Content class="space-y-4 p-4 sm:p-5">
 			<div class="space-y-1.5"><Label for="contract-status">Status</Label><select id="contract-status" name="status" bind:value={status} class="h-9 w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm shadow-xs outline-none focus:border-ring focus:ring-3 focus:ring-ring/20">{#each ['draft', 'active', 'ended'] as option}<option value={option}>{statusLabel(option)}</option>{/each}</select></div>
-			<div class="space-y-1.5"><Label for="contract-start-date">Start date</Label><DatePicker id="contract-start-date" name="start_date" bind:value={startDate} placeholder="Choose start date" /></div>
-			<div class="space-y-1.5"><Label for="contract-end-date">End date</Label><DatePicker id="contract-end-date" name="end_date" bind:value={endDate} placeholder="Choose end date" /></div>
-			<div class="rounded-md border border-border bg-muted/30 p-3 text-xs leading-5 text-muted-foreground"><CalendarDays class="mb-1 size-3.5" /><span>Dates are optional while the contract is a draft. Add them when the engagement is ready.</span></div>
 			{#if formMessage}<p role="alert" class="text-sm text-destructive">{formMessage}</p>{/if}
 			<div class="flex flex-col gap-2"><Button type="submit" class="w-full">{submitLabel}</Button><Button variant="outline" size="sm" href={cancelHref} class="w-full">Cancel</Button></div>
 		</Card.Content>

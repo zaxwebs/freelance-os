@@ -1,15 +1,15 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { contractNameForProject, isValidContractDateRange, normalizeContractDate } from '$lib/server/contracts';
-import { getCurrentUser } from '$lib/server/workspace';
+import { contractNameForProject } from '$lib/server/contracts';
+import { getAccountIdentity, getCurrentUser } from '$lib/server/workspace';
 
 export const load: PageServerLoad = async ({ locals: { supabase }, params }) => {
 	const user = await getCurrentUser(supabase);
 	if (!user) throw redirect(303, '/');
 
 	const [projectResult, templatesResult, existingContractResult] = await Promise.all([
-		supabase.from('projects').select('id,name').eq('id', params.id).single(),
-		supabase.from('contract_templates').select('id,name').order('created_at', { ascending: true }),
+		supabase.from('projects').select('id,name,client_id').eq('id', params.id).single(),
+		supabase.from('contract_templates').select('id,name,content').order('created_at', { ascending: true }),
 		supabase.from('contracts').select('id').eq('project_id', params.id).maybeSingle()
 	]);
 	if (projectResult.error || !projectResult.data) throw redirect(303, '/projects');
@@ -17,7 +17,14 @@ export const load: PageServerLoad = async ({ locals: { supabase }, params }) => 
 	if (existingContractResult.error) throw existingContractResult.error;
 	if (existingContractResult.data) throw redirect(303, `/projects/${params.id}/contracts/${existingContractResult.data.id}/edit`);
 
-	return { project: projectResult.data, templates: templatesResult.data ?? [] };
+	let clientName: string | null = null;
+	if (projectResult.data.client_id) {
+		const { data: client, error: clientError } = await supabase.from('clients').select('name').eq('id', projectResult.data.client_id).maybeSingle();
+		if (clientError) throw clientError;
+		clientName = client?.name ?? null;
+	}
+
+	return { project: projectResult.data, clientName, freelancerName: getAccountIdentity(user).name, templates: templatesResult.data ?? [] };
 };
 
 export const actions: Actions = {
@@ -27,10 +34,6 @@ export const actions: Actions = {
 
 		const formData = await request.formData();
 		const templateId = String(formData.get('template_id') ?? '').trim() || null;
-		const startDate = normalizeContractDate(String(formData.get('start_date') ?? ''));
-		const endDate = normalizeContractDate(String(formData.get('end_date') ?? ''));
-		if (startDate === undefined || endDate === undefined) return fail(400, { message: 'Choose valid contract dates.' });
-		if (!isValidContractDateRange(startDate, endDate)) return fail(400, { message: 'The end date must be on or after the start date.' });
 
 		const { data: project, error: projectError } = await supabase.from('projects').select('id,name').eq('id', params.id).single();
 		if (projectError || !project) return fail(400, { message: projectError?.message ?? 'Could not find that project.' });
@@ -48,8 +51,6 @@ export const actions: Actions = {
 			template_id: templateId,
 			name: contractNameForProject(project.name),
 			content,
-			start_date: startDate,
-			end_date: endDate,
 			status: 'draft'
 		}).select('id').single();
 		if (contractError || !contract) return fail(400, { message: contractError?.message ?? 'Could not create the contract.' });

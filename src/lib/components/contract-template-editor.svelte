@@ -6,6 +6,7 @@
 	import List from '@lucide/svelte/icons/list';
 	import ListOrdered from '@lucide/svelte/icons/list-ordered';
 	import Underline from '@lucide/svelte/icons/underline';
+	import { contractPlaceholderDefinitions } from '$lib/app/contract-placeholders';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card';
 	import Input from '$lib/components/ui/input/input.svelte';
@@ -79,19 +80,13 @@
 					<div bind:this={editor} id="template-content" class="min-h-80 px-4 py-4 text-sm leading-7 outline-none empty:before:text-muted-foreground empty:before:content-[attr(data-placeholder)] [&_h2]:mb-3 [&_h2]:text-lg [&_h2]:font-semibold [&_li]:ml-5 [&_li]:list-disc [&_ol_li]:list-decimal [&_p]:mb-3" contenteditable="true" data-placeholder="Start writing your agreement..." role="textbox" aria-multiline="true" aria-label="Contract content" oninput={syncContent}></div>
 				</div>
 				<input type="hidden" name="content" value={content} />
-				<p class="text-xs text-muted-foreground">Formatting is saved with the template. You can add reusable details as placeholders.</p>
+				<p class="text-xs text-muted-foreground">Formatting is saved with the template. Add smart fields for details that should fill from a project.</p>
 			</div>
 
 			<div class="space-y-2 rounded-md border border-border bg-muted/20 p-3">
-				<div><p class="text-xs font-semibold text-foreground">Insert placeholder</p><p class="mt-0.5 text-xs text-muted-foreground">These will be filled in when a contract is created from the template later.</p></div>
+				<div><p class="text-xs font-semibold text-foreground">Insert smart field</p><p class="mt-0.5 text-xs text-muted-foreground">These resolve to project details when the contract is viewed.</p></div>
 				<div class="flex flex-wrap gap-1.5">
-					{#each [
-						{ label: 'Client name', value: 'client_name' },
-						{ label: 'Project name', value: 'project_name' },
-						{ label: 'Freelancer name', value: 'freelancer_name' },
-						{ label: 'Start date', value: 'start_date' },
-						{ label: 'End date', value: 'end_date' }
-					] as placeholder (placeholder.value)}
+					{#each contractPlaceholderDefinitions as placeholder (placeholder.value)}
 						<button type="button" class="rounded-md border border-border bg-background px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30" onclick={() => insertPlaceholder(placeholder.value)}>{placeholder.label}</button>
 					{/each}
 				</div>

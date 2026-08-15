@@ -29,7 +29,7 @@
 		</Card.Header>
 		<Card.Content class="p-0">
 			{#if data.templates.length === 0}
-				<div class="flex flex-col items-center px-6 py-14 text-center"><div class="flex size-10 items-center justify-center rounded-md bg-muted"><ClipboardPenLine class="size-5 text-muted-foreground" /></div><h2 class="mt-4 text-sm font-semibold">No templates yet</h2><p class="mt-1 max-w-sm text-xs leading-5 text-muted-foreground">Create your first reusable agreement. You can add placeholders for client, project, freelancer, and dates.</p><Button href="/contracts/templates/new" size="sm" class="mt-4"><Plus class="size-3.5" /> Create template</Button></div>
+				<div class="flex flex-col items-center px-6 py-14 text-center"><div class="flex size-10 items-center justify-center rounded-md bg-muted"><ClipboardPenLine class="size-5 text-muted-foreground" /></div><h2 class="mt-4 text-sm font-semibold">No templates yet</h2><p class="mt-1 max-w-sm text-xs leading-5 text-muted-foreground">Create your first reusable agreement. Add smart fields for client, project, or freelancer details.</p><Button href="/contracts/templates/new" size="sm" class="mt-4"><Plus class="size-3.5" /> Create template</Button></div>
 			{:else}
 				<div class="hidden border-b border-border bg-muted/20 px-4 py-2.5 text-[10px] font-semibold tracking-[0.12em] text-muted-foreground uppercase sm:grid sm:grid-cols-[minmax(220px,1fr)_200px] sm:items-center sm:px-5"><span>Template</span><span class="text-right">Actions</span></div>
 				<div class="divide-y divide-border/70">

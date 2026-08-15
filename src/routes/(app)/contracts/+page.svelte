@@ -7,7 +7,7 @@
 	import * as Card from '$lib/components/ui/card';
 	import ContractSectionNav from '$lib/components/contract-section-nav.svelte';
 	import PageHeader from '$lib/components/page-header.svelte';
-	import { formatDate, statusClass, statusLabel } from '$lib/app/format';
+	import { statusClass, statusLabel } from '$lib/app/format';
 	import type { PageData } from './$types';
 
 	let { data } = $props<{ data: PageData }>();
@@ -35,7 +35,6 @@
 						<a href={`/projects/${contract.project_id}/contracts/${contract.id}`} class="group flex items-center gap-3 px-4 py-4 transition-colors hover:bg-muted/40 sm:px-5">
 							<div class="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground"><ClipboardPenLine class="size-4" /></div>
 							<div class="min-w-0 flex-1"><p class="truncate text-sm font-semibold group-hover:text-primary">{contract.name}</p><p class="mt-1 truncate text-xs text-muted-foreground">{contract.projectName}</p></div>
-							<div class="hidden items-center gap-4 text-xs text-muted-foreground md:flex"><span>{contract.start_date ? formatDate(contract.start_date, { month: 'short', day: 'numeric', year: 'numeric' }) : 'No start date'}{contract.end_date ? ` – ${formatDate(contract.end_date, { month: 'short', day: 'numeric', year: 'numeric' })}` : ''}</span></div>
 							<Badge class={statusClass(contract.status)}>{statusLabel(contract.status)}</Badge><ArrowRight class="size-3.5 text-muted-foreground transition-transform group-hover:translate-x-1" />
 						</a>
 					{/each}

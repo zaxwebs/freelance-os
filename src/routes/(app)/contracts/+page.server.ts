@@ -7,7 +7,7 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
 	if (!user) throw redirect(303, '/');
 
 	const [contractsResult, projectsResult] = await Promise.all([
-		supabase.from('contracts').select('id,project_id,name,start_date,end_date,status,created_at').order('created_at', { ascending: false }),
+		supabase.from('contracts').select('id,project_id,name,status,created_at').order('created_at', { ascending: false }),
 		supabase.from('projects').select('id,name').order('created_at', { ascending: false })
 	]);
 	if (contractsResult.error) throw contractsResult.error;

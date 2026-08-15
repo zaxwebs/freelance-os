@@ -11,7 +11,7 @@ export const load: PageServerLoad = async ({ locals: { supabase }, params }) => 
 		supabase.from('clients').select('*').order('name'),
 		supabase.from('invoices').select('*').eq('project_id', params.id).order('issue_date', { ascending: false }),
 		supabase.from('finance_expenses').select('*').eq('project_id', params.id).order('expense_date', { ascending: false }),
-		supabase.from('contracts').select('id,project_id,name,start_date,end_date,status,content,template_id,created_at,updated_at').eq('project_id', params.id).maybeSingle(),
+		supabase.from('contracts').select('id,project_id,name,status,content,template_id,created_at,updated_at').eq('project_id', params.id).maybeSingle(),
 		supabase.from('contract_templates').select('id,name').order('created_at', { ascending: true }),
 		getDisplayCurrency(supabase, user.id)
 	]);
