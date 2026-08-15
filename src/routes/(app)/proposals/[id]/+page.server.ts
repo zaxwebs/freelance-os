@@ -2,7 +2,8 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { supportedCurrencies, getMinorUnits } from '$lib/app/currency';
 import { getEffectiveBillingCurrency, defaultFinanceCurrency, getExchangeRate, isSupportedCurrency, isValidDate } from '$lib/server/finance';
-import { parseProposalLineItems, proposalTotals } from '$lib/server/proposals';
+import { invoiceService } from '$lib/server/invoices';
+import { parseProposalLineItems, proposalService, proposalTotals } from '$lib/server/proposals';
 import { getAccountIdentity, getCurrentUser } from '$lib/server/workspace';
 
 async function getProposalContext(supabase: Parameters<typeof getCurrentUser>[0], proposalId: string, user: NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>) {
@@ -85,7 +86,7 @@ export const actions: Actions = {
 		if ('error' in fields.lineItemsResult) return fail(400, { message: fields.lineItemsResult.error });
 		const { data: existingProposal, error: existingError } = await supabase.from('proposals').select('status').eq('id', params.id).single();
 		if (existingError || !existingProposal) return fail(404, { message: 'Proposal not found.' });
-		if (existingProposal.status !== 'draft') return fail(400, { message: 'Only draft proposals can be edited.' });
+		if (!proposalService.canEdit(existingProposal.status)) return fail(400, { message: 'Only draft proposals can be edited.' });
 
 		const clientResult = await supabase.from('clients').select('id,default_currency_code').eq('id', fields.clientId).single();
 		if (clientResult.error || !clientResult.data) return fail(400, { message: 'Choose a valid client.' });
@@ -105,7 +106,7 @@ export const actions: Actions = {
 		if (!user) return fail(401, { message: 'Sign in before updating a proposal.' });
 		const { data: proposal, error: proposalError } = await supabase.from('proposals').select('status').eq('id', params.id).single();
 		if (proposalError || !proposal) return fail(404, { message: 'Proposal not found.' });
-		if (proposal.status !== 'draft') return fail(400, { message: 'Only draft proposals can be marked as sent.' });
+		if (!proposalService.canMarkSent(proposal.status)) return fail(400, { message: 'Only draft proposals can be marked as sent.' });
 		const { error: updateError } = await supabase.from('proposals').update({ status: 'sent', sent_at: new Date().toISOString() }).eq('id', params.id);
 		if (updateError) return fail(400, { message: updateError.message });
 		return { success: true, message: 'Proposal marked as sent.' };
@@ -115,7 +116,7 @@ export const actions: Actions = {
 		if (!user) return fail(401, { message: 'Sign in before updating a proposal.' });
 		const { data: proposal, error: proposalError } = await supabase.from('proposals').select('status,valid_until').eq('id', params.id).single();
 		if (proposalError || !proposal) return fail(404, { message: 'Proposal not found.' });
-		if (!['sent', 'viewed'].includes(proposal.status)) return fail(400, { message: 'Only sent proposals can be accepted.' });
+		if (!proposalService.canAccept(proposal.status)) return fail(400, { message: 'Only sent proposals can be accepted.' });
 		if (proposal.valid_until && proposal.valid_until < new Date().toISOString().slice(0, 10)) {
 			await supabase.from('proposals').update({ status: 'expired' }).eq('id', params.id);
 			return fail(400, { message: 'This proposal has expired. Extend its validity before accepting it.' });
@@ -129,7 +130,7 @@ export const actions: Actions = {
 		if (!user) return fail(401, { message: 'Sign in before updating a proposal.' });
 		const { data: proposal, error: proposalError } = await supabase.from('proposals').select('status').eq('id', params.id).single();
 		if (proposalError || !proposal) return fail(404, { message: 'Proposal not found.' });
-		if (!['sent', 'viewed'].includes(proposal.status)) return fail(400, { message: 'Only sent proposals can be declined.' });
+		if (!proposalService.canDecline(proposal.status)) return fail(400, { message: 'Only sent proposals can be declined.' });
 		const { error: updateError } = await supabase.from('proposals').update({ status: 'declined', declined_at: new Date().toISOString() }).eq('id', params.id);
 		if (updateError) return fail(400, { message: updateError.message });
 		return { success: true, message: 'Proposal declined.' };
@@ -142,8 +143,8 @@ export const actions: Actions = {
 		const createInvoice = formData.get('create_invoice') === 'on';
 		const depositAmount = Number(String(formData.get('deposit_amount') ?? '').replace(/,/g, '').trim());
 		const context = await getProposalContext(supabase, params.id, user);
-		if (context.proposal.status !== 'accepted') return fail(400, { message: 'Only accepted proposals can be converted.' });
 		if (context.proposal.converted_at) return fail(400, { message: 'This proposal has already been converted.' });
+		if (!proposalService.canConvert(context.proposal.status, context.proposal.converted_at)) return fail(400, { message: 'Only accepted proposals can be converted.' });
 		if (createInvoice && (!Number.isFinite(depositAmount) || depositAmount <= 0 || depositAmount > Number(context.proposal.total) + 0.0001)) return fail(400, { message: 'Enter a deposit amount between zero and the proposal total.' });
 
 		if (!projectName) return fail(400, { message: 'Add a project name before converting.' });
@@ -167,11 +168,11 @@ export const actions: Actions = {
 			const issuerSnapshot = { name: context.issuer.name, legal_name: context.issuer.legalName, email: context.issuer.email, phone: context.issuer.phone, website: context.issuer.website, address: context.issuer.address, tax_id_label: context.issuer.taxIdLabel, tax_id: context.issuer.taxId, footer_note: context.issuer.footerNote };
 			const clientSnapshot = { name: context.client?.name ?? null, company: context.client?.company ?? null, email: context.client?.email ?? null, address: context.client?.billing_address ?? null, tax_id_label: context.client?.tax_id_label ?? null, tax_id: context.client?.tax_id ?? null };
 			const invoiceNumber = `INV-${issueDate.slice(0, 4)}-${crypto.randomUUID().replace(/-/g, '').slice(0, 8).toUpperCase()}`;
-			const { data: invoice, error: invoiceError } = await supabase.from('invoices').insert({ user_id: user.id, client_id: context.proposal.client_id, project_id: projectId, invoice_number: invoiceNumber, status: 'draft', issue_date: issueDate, due_date: dueDate, currency_code: context.proposal.currency_code, base_currency_code: defaultFinanceCurrency, exchange_rate_to_usd: exchangeRate.rate, exchange_rate_date: exchangeRate.rateDate, subtotal: depositAmount, tax_total: 0, discount_total: 0, total: depositAmount, base_subtotal: baseAmount, base_tax_total: 0, base_discount_total: 0, base_total: baseAmount, base_amount_paid: 0, notes: `Deposit for ${context.proposal.title}`, payment_instructions: context.settings?.default_payment_instructions ?? null, sent_at: null, issuer_snapshot: issuerSnapshot, client_snapshot: clientSnapshot, snapshot_at: snapshotAt }).select('id').single();
-			if (invoiceError || !invoice) return fail(400, { message: invoiceError?.message ?? 'Could not create the deposit invoice.' });
-			const { error: lineItemError } = await supabase.from('invoice_line_items').insert({ user_id: user.id, invoice_id: invoice.id, project_id: projectId, position: 0, description: `Deposit for ${context.proposal.title}`, quantity: 1, unit_price: depositAmount, tax_rate: 0, amount: depositAmount });
-			if (lineItemError) return fail(400, { message: lineItemError.message });
-			invoiceId = invoice.id;
+			try {
+				invoiceId = await invoiceService.createWithLineItems(supabase, { user_id: user.id, client_id: context.proposal.client_id, project_id: projectId, invoice_number: invoiceNumber, status: 'draft', issue_date: issueDate, due_date: dueDate, currency_code: context.proposal.currency_code, base_currency_code: defaultFinanceCurrency, exchange_rate_to_usd: exchangeRate.rate, exchange_rate_date: exchangeRate.rateDate, subtotal: depositAmount, tax_total: 0, discount_total: 0, total: depositAmount, base_subtotal: baseAmount, base_tax_total: 0, base_discount_total: 0, base_total: baseAmount, base_amount_paid: 0, notes: `Deposit for ${context.proposal.title}`, payment_instructions: context.settings?.default_payment_instructions ?? null, sent_at: null, issuer_snapshot: issuerSnapshot, client_snapshot: clientSnapshot, snapshot_at: snapshotAt }, [{ user_id: user.id, project_id: projectId, position: 0, description: `Deposit for ${context.proposal.title}`, quantity: 1, unit_price: depositAmount, tax_rate: 0, amount: depositAmount }]);
+			} catch (error) {
+				return fail(400, { message: error instanceof Error ? error.message : 'Could not create the deposit invoice.' });
+			}
 		}
 
 		const { error: conversionError } = await supabase.from('proposals').update({ converted_at: new Date().toISOString() }).eq('id', params.id);

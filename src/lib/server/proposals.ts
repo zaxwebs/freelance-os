@@ -1,3 +1,5 @@
+import { canTransitionProposal } from '$lib/app/statuses';
+
 export type SubmittedProposalLineItem = {
 	description?: unknown;
 	quantity?: unknown;
@@ -46,3 +48,25 @@ export function proposalTotals(items: ParsedProposalLineItem[]) {
 	const taxTotal = Number(items.reduce((sum, item) => sum + item.lineTax, 0).toFixed(4));
 	return { subtotal, taxTotal, total: Number((subtotal + taxTotal).toFixed(4)) };
 }
+
+export const proposalService = {
+	canEdit(status: string) {
+		return status === 'draft';
+	},
+
+	canMarkSent(status: string) {
+		return canTransitionProposal(status, 'sent');
+	},
+
+	canAccept(status: string) {
+		return canTransitionProposal(status, 'accepted');
+	},
+
+	canDecline(status: string) {
+		return canTransitionProposal(status, 'declined');
+	},
+
+	canConvert(status: string, convertedAt: string | null) {
+		return status === 'accepted' && !convertedAt;
+	}
+};

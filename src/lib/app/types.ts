@@ -8,17 +8,8 @@ export type InvoiceLineItem = Tables<'invoice_line_items'>;
 export type InvoicePayment = Tables<'invoice_payments'>;
 export type FinanceExpense = Tables<'finance_expenses'>;
 
-export const invoiceStatuses = [
-	{ value: 'draft', label: 'Draft' },
-	{ value: 'sent', label: 'Sent' },
-	{ value: 'viewed', label: 'Viewed' },
-	{ value: 'partially_paid', label: 'Partially paid' },
-	{ value: 'paid', label: 'Paid' },
-	{ value: 'overdue', label: 'Overdue' },
-	{ value: 'void', label: 'Void' }
-] as const;
-
-export type InvoiceStatus = (typeof invoiceStatuses)[number]['value'];
+export { invoiceStatuses } from './statuses';
+export type { InvoiceStatus } from './statuses';
 
 export const expenseCategories = ['Software', 'Equipment', 'Travel', 'Contractors', 'Office', 'Taxes', 'Other'] as const;
 

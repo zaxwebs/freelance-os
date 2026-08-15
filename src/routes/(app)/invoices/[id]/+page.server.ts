@@ -1,6 +1,7 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getAccountIdentity, getCurrentUser } from '$lib/server/workspace';
+import { invoiceService } from '$lib/server/invoices';
 import { convertBaseAmount, defaultFinanceCurrency, getDisplayCurrency, getDisplayInvoiceStatus, getExchangeRate, isValidDate } from '$lib/server/finance';
 import { getMinorUnits } from '$lib/app/currency';
 
@@ -85,7 +86,7 @@ export const actions: Actions = {
 		if (!user) return fail(401, { message: 'Sign in before updating an invoice.' });
 		const { data: invoice, error: invoiceError } = await supabase.from('invoices').select('status').eq('id', params.id).single();
 		if (invoiceError || !invoice) return fail(404, { message: 'Invoice not found.' });
-		if (invoice.status !== 'draft') return fail(400, { message: 'Only draft invoices can be marked as sent.' });
+		if (!invoiceService.canMarkSent(invoice.status)) return fail(400, { message: 'Only draft invoices can be marked as sent.' });
 		const { error: updateError } = await supabase.from('invoices').update({ status: 'sent', sent_at: new Date().toISOString() }).eq('id', params.id);
 		if (updateError) return fail(400, { message: updateError.message });
 		return { success: true, message: 'Invoice marked as sent.' };
@@ -102,11 +103,11 @@ export const actions: Actions = {
 		const { data: invoice, error: invoiceError } = await supabase.from('invoices').select('total,amount_paid,status,currency_code').eq('id', params.id).single();
 		if (invoiceError || !invoice) return fail(404, { message: 'Invoice not found.' });
 		const outstanding = Number(invoice.total) - Number(invoice.amount_paid);
-		if (invoice.status === 'void') return fail(400, { message: 'Void invoices cannot receive payments.' });
+		if (!invoiceService.canRecordPayment(invoice.status)) return fail(400, { message: 'Void invoices cannot receive payments.' });
 		if (!Number.isFinite(amount) || amount <= 0) return fail(400, { message: 'Enter a payment amount greater than zero.' });
 		if (amount > outstanding + 0.0001) return fail(400, { message: 'Payment cannot be greater than the outstanding balance.' });
 		if (!isValidDate(paymentDate)) return fail(400, { message: 'Choose a valid payment date.' });
-		if (!['bank_transfer', 'card', 'cash', 'check', 'other'].includes(method)) return fail(400, { message: 'Choose a valid payment method.' });
+		if (!invoiceService.isValidPaymentMethod(method)) return fail(400, { message: 'Choose a valid payment method.' });
 		let exchangeRate;
 		try {
 			exchangeRate = await getExchangeRate(supabase, user.id, invoice.currency_code, defaultFinanceCurrency, paymentDate);
@@ -124,7 +125,7 @@ export const actions: Actions = {
 		const { data: invoice, error: invoiceError } = await supabase.from('invoices').select('amount_paid,status').eq('id', params.id).single();
 		if (invoiceError || !invoice) return fail(404, { message: 'Invoice not found.' });
 		if (Number(invoice.amount_paid) > 0) return fail(400, { message: 'Paid invoices cannot be voided. Add a credit note workflow before changing this invoice.' });
-		if (invoice.status === 'void') return { success: true, message: 'Invoice is already void.' };
+		if (!invoiceService.canVoid(invoice.status, Number(invoice.amount_paid))) return { success: true, message: 'Invoice is already void.' };
 		const { error: updateError } = await supabase.from('invoices').update({ status: 'void' }).eq('id', params.id);
 		if (updateError) return fail(400, { message: updateError.message });
 		return { success: true, message: 'Invoice voided.' };

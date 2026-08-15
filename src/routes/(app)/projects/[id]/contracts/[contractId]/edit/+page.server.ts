@@ -1,7 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { analyzeContractPlaceholders } from '$lib/app/contract-placeholders';
-import { contractNameForProject, contractStatuses } from '$lib/server/contracts';
+import { contractService } from '$lib/server/contracts';
 import { hasContractTemplateContent, sanitizeContractTemplateContent } from '$lib/server/contract-templates';
 import { getAccountIdentity, getCurrentUser } from '$lib/server/workspace';
 
@@ -44,16 +44,19 @@ export const actions: Actions = {
 		const status = String(formData.get('status') ?? 'draft').trim();
 
 		if (!hasContractTemplateContent(content)) return fail(400, { message: 'Add some contract content before saving.' });
-		if (!contractStatuses.includes(status as (typeof contractStatuses)[number])) return fail(400, { message: 'Choose a valid contract status.' });
+		if (!contractService.isValidStatus(status)) return fail(400, { message: 'Choose a valid contract status.' });
 
 		const { data: project, error: projectError } = await supabase.from('projects').select('id,name').eq('id', params.id).single();
 		if (projectError || !project) return fail(400, { message: projectError?.message ?? 'Could not find that project.' });
 
-		const { error } = await supabase.from('contracts').update({
-			name: contractNameForProject(project.name),
+		const { error } = await contractService.update(supabase, {
+			userId: user.id,
+			projectId: params.id,
+			contractId: params.contractId,
+			projectName: project.name,
 			content,
 			status
-		}).eq('id', params.contractId).eq('project_id', params.id).eq('user_id', user.id);
+		});
 		if (error) return fail(400, { message: error.message });
 
 		throw redirect(303, `/projects/${params.id}/contracts/${params.contractId}`);

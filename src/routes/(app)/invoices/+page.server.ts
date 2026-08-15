@@ -1,5 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { invoiceStoredStatuses } from '$lib/app/statuses';
 import { getCurrentUser } from '$lib/server/workspace';
 import { convertBaseAmount, defaultFinanceCurrency, getDisplayCurrency, getDisplayInvoiceStatus, getExchangeRate } from '$lib/server/finance';
 import { getPagination, PAGE_SIZE, parsePage } from '$lib/server/pagination';
@@ -12,13 +13,13 @@ export const load: PageServerLoad = async ({ locals: { supabase }, url }) => {
 	const requestedPage = parsePage(url.searchParams.get('page'));
 	const today = new Date().toISOString().slice(0, 10);
 	const pageCountQuery = supabase.from('invoices').select('id', { count: 'exact', head: true });
-	if (requestedStatus === 'draft' || requestedStatus === 'sent' || requestedStatus === 'partially_paid' || requestedStatus === 'paid' || requestedStatus === 'void') pageCountQuery.eq('status', requestedStatus);
+	if (invoiceStoredStatuses.includes(requestedStatus as (typeof invoiceStoredStatuses)[number])) pageCountQuery.eq('status', requestedStatus);
 	if (requestedStatus === 'overdue') pageCountQuery.in('status', ['sent', 'partially_paid']).lt('due_date', today);
 	const pageCountResult = await pageCountQuery;
 	if (pageCountResult.error) throw pageCountResult.error;
 	const pagination = getPagination(requestedPage, pageCountResult.count ?? 0, PAGE_SIZE);
 	const pageQuery = supabase.from('invoices').select('*').order('issue_date', { ascending: false }).order('created_at', { ascending: false });
-	if (requestedStatus === 'draft' || requestedStatus === 'sent' || requestedStatus === 'partially_paid' || requestedStatus === 'paid' || requestedStatus === 'void') pageQuery.eq('status', requestedStatus);
+	if (invoiceStoredStatuses.includes(requestedStatus as (typeof invoiceStoredStatuses)[number])) pageQuery.eq('status', requestedStatus);
 	if (requestedStatus === 'overdue') pageQuery.in('status', ['sent', 'partially_paid']).lt('due_date', today);
 	const pageResult = await pageQuery.range((pagination.page - 1) * PAGE_SIZE, pagination.page * PAGE_SIZE - 1);
 	if (pageResult.error) throw pageResult.error;

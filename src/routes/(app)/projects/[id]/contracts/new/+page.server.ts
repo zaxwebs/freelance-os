@@ -1,6 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { contractNameForProject } from '$lib/server/contracts';
+import { contractService } from '$lib/server/contracts';
 import { getAccountIdentity, getCurrentUser } from '$lib/server/workspace';
 
 export const load: PageServerLoad = async ({ locals: { supabase }, params }) => {
@@ -45,14 +45,13 @@ export const actions: Actions = {
 			content = template.content;
 		}
 
-		const { data: contract, error: contractError } = await supabase.from('contracts').insert({
+		const { data: contract, error: contractError } = await contractService.create(supabase, {
 			user_id: user.id,
 			project_id: project.id,
 			template_id: templateId,
-			name: contractNameForProject(project.name),
-			content,
-			status: 'draft'
-		}).select('id').single();
+			projectName: project.name,
+			content
+		});
 		if (contractError || !contract) return fail(400, { message: contractError?.message ?? 'Could not create the contract.' });
 
 		throw redirect(303, `/projects/${project.id}/contracts/${contract.id}/edit`);
